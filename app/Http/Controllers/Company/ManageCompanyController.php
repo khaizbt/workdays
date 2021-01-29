@@ -16,19 +16,20 @@ class ManageCompanyController extends Controller
 
     public function data(Request $request){
         $post = $request->all();
+        if($request->ajax()) {
+            $data = Company::all();
 
-        $data = Company::all();
+            // return $data;
 
-        // return $data;
-
-        return Datatables::of($data)
-            ->addColumn('action', function ($data) {
-                return "<a href='".route('company.edit', [$data['id']])."'><i class='fa fa-envelope text-info btn-email'></i></a>
-                | <a href='".route('company.destroy', [$data['id']])."' class='btn-delete' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
-        })
-        ->addIndexColumn()
-            ->rawColumns(['action'])
-            ->make(true);
+            return Datatables::of($data)
+                ->addColumn('action', function ($data) {
+                    return "<a href='".route('company.edit', [$data['id']])."'><i class='fa fa-envelope text-info btn-email'></i></a>
+                    | <a href='".route('company.destroy', [$data['id']])."' class='btn-delete' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+            })
+            ->addIndexColumn()
+                ->rawColumns(['action'])
+                ->make(true);
+        }
     }
 
     public function create(){
@@ -54,7 +55,7 @@ class ManageCompanyController extends Controller
 
     public function update(Request $request, $id){
         $update = Company::where('id', $id)
-          ->update(['name' => $request->name, 'id_user' => $request->id_user, 'logo' => $request->logo]);
+            ->update(['name' => $request->name, 'id_user' => $request->id_user, 'logo' => $request->logo]);
 
         return 'Sukses';
     }

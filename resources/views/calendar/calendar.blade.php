@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Dashboard
+Calendar
 @endsection
 
 @section('content')

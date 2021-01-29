@@ -9,7 +9,7 @@ Route::get('home', function() {
 
 
 Route::prefix('holidays')->group(function() {
-    Route::get('/', 'Holidays\ManageHolidaysController@index');
+    Route::get('/', 'Holidays\ManageHolidaysController@index')->name("holiday.index");
     Route::get('count-working/{startDate}', 'Holidays\ManageHolidaysController@countWorking')->name('holiday.count.working');
 
 });
@@ -24,6 +24,10 @@ Route::prefix('company')->middleware('auth')->group(function(){
     Route::delete('delete/{id}', 'Company\ManageCompanyController@destroy')->name('company.destroy');
 });
 
+Route::prefix("employee")->middleware("auth")->group(function(){
+    Route::get("/", "Company\EmployeeController@create");
+    Route::post("store", "Company\EmployeeController@store")->name("employee.store");
+});
 
 
 

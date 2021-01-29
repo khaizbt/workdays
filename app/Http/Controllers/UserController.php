@@ -22,7 +22,6 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        // $this->authorize(User::class, 'index');
 
         if($request->ajax())
         {
@@ -31,7 +30,7 @@ class UserController extends Controller
             {
                 $users = $users->where('name', 'like', '%'.$request->q.'%')->orWhere('email', $request->q);
             }
-            $users = $users->paginate(config('stisla.perpage'))->appends(['q' => $request->q]);
+            $users = $users->paginate(config('stisla.perpage'))->whereNotIn('level', [3])->appends(['q' => $request->q]);
             return response()->json($users);
         }
         return view('admin.users.index');
