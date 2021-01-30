@@ -11,7 +11,9 @@ use App\User;
 class ManageCompanyController extends Controller
 {
     public function index(){
-        return view('admin.company.index');
+        $is_data_empty = Company::all()->count() == 0 ? true : false;
+
+        return view('admin.company.index', ['is_data_empty' => $is_data_empty]);
     }
 
     public function data(Request $request){
