@@ -24,7 +24,7 @@ class EmployeeController extends Controller
         $post = $request->except("_token");
         // return $post;
         DB::beginTransaction();
-        // try {
+        try {
             $save = User::create([
                 'name' => $post['name'],
                 'email' => $post['email'],
@@ -42,14 +42,62 @@ class EmployeeController extends Controller
                     "user_id" => $save['id'],
                 ]);
 
-                
+
 
             }
             DB::commit();
             return $company;
 
-        // } catch (\Throwable $th) {
-        //     //throw $th;
-        // }
+        } catch (\Throwable $th) {
+            DB::rollback();
+        }
+    }
+
+    public function edit($id) {
+        $employee = Employee::where('id', $id)->first();
+
+        $user = User::where('id', $employee['user_id'])->first();
+
+        return view("employee.edit")->with(['user' => $user, 'employee' => $employee]);
+    }
+
+    public function update(Request $request, $id) {
+        $post = $request->except("_token", 'user_id');
+
+
+
+        DB::beginTransaction();
+        try {
+
+            $employee = Employee::where('id', $id)->first();
+
+            $update = $employee->update($post);
+
+            $user = User::where('id', $employee['user_id'])->first();
+
+            $update_user = $user->update(["email" => $post['email']]);
+
+            if(isset($post['password']) && $post['password'] != null) {
+                $user->update(["password" => \Hash::make($post['password'])]);
+            }
+
+            DB::commit();
+            return "success";
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+    }
+
+    public function delete($id) {
+        DB::beginTransaction();
+        try {
+            $employee = Employee::where('id', $id)->first();
+            User::where("id", $employee['user_id'])->delete();
+            $delete = $employee->delete();
+            DB::commit();
+            return "success";
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 }

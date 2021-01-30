@@ -25,8 +25,11 @@ Route::prefix('company')->middleware('auth')->group(function(){
 });
 
 Route::prefix("employee")->middleware("auth")->group(function(){
-    Route::get("/", "Company\EmployeeController@create");
+    Route::get("/", "Company\EmployeeController@index")->name("employee.index");
+    Route::get("create", "Company\EmployeeController@create")->name("employee.create");
     Route::post("store", "Company\EmployeeController@store")->name("employee.store");
+    Route::get("edit/{id}", "Company\EmployeeController@edit")->name("employee.edit");
+    Route::post("update/{id}", "Company\EmployeeController@update")->name("employee.update");
 });
 
 

@@ -6,36 +6,37 @@ Dashboard
 
 @section('content')
 <section class="section">
-    <div class="section-header">
-        <h1>Create Employee</h1>
-        <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Employeee</a></div>
-            <div class="breadcrumb-item">Create Employee</div>
-        </div>
-    </div>
-    <div class="section-body">
+  <div class="section-header">
+    <h1>Edit Companies</h1>
+    <div class="section-header-breadcrumb">
+        <div class="breadcrumb-item active"><a href="{{ route('company.index') }}">Companies</a></div>
+        <div class="breadcrumb-item">Edit Companies</div>
+      </div>
+  </div>
+
+  <div class="section-body">
         <div class="row">
             <div class="col-md-8 col-sm-12">
                 <div class="card">
-                    <form action="{{route('employee.store')}}" method="POST">
+                    <form action="{{route('employee.update', $employee['id'])}}" method="POST">
                         @csrf
                         <div class="card-header"><h4>Add a New Company</h4></div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Name</label>
-                                <input type="text" class="form-control" name="name">
+                                <input type="text" class="form-control" name="name" value="{{ $user['name'] }}">
                             </div>
                             <div class="form-group">
                                 <label for="title">Position</label>
-                                <input type="text" class="form-control" name="position">
+                                <input type="text" class="form-control" name="position" value="{{  $employee['position'] }}">
                             </div>
                             <div class="form-group">
                                 <label for="title">Status</label>
-                                <input type="text" class="form-control" name="status" value="active">
+                                <input type="text" class="form-control" name="status" value="{{ $employee['status'] }}">
                             </div>
                             <div class="form-group">
                                 <label for="title">Email</label>
-                                <input type="email" class="form-control" name="email">
+                                <input type="email" class="form-control" name="email" value="{{ $user['email'] }}">
                             </div>
                             <div class="form-group">
                                 <label for="title">Password</label>
@@ -43,7 +44,7 @@ Dashboard
                             </div>
                             <div class="form-group">
                                 <label for="title">Salary</label>
-                                <input type="number" class="form-control" name="salary">
+                                <input type="number" class="form-control" name="salary" value="{{ $employee['salary'] }}">
                             </div>
                         </div>
                             <div class="card-footer">
@@ -53,9 +54,9 @@ Dashboard
                         </form>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+          </div>
+      </div>
+  </div>
 </section>
 @endsection
 @section('scripts')

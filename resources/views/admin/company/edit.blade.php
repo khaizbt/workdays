@@ -28,12 +28,14 @@ Dashboard
                             </div>
                             <div class="form-group">
                                 <label for="admin">Admin</label>
-                                @foreach($user as $key => $value)
+
                                 <select name="id_user" id="select2" class="form-control">
                                     <option value="">Choose Admin</option>
+                                    @foreach($user as $key => $value)
                                     <option value="{{$value['id']}}" {{($value['id'] == $data['id_user']) ? 'selected' : ''}}>{{$value['name']}}</option>
+                                    @endforeach
                                 </select>
-                                @endforeach
+
                             </div>
                             <div class="form-group">
                                 <label for="logo">Logo</label>
