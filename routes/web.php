@@ -32,6 +32,11 @@ Route::prefix("employee")->middleware("auth")->group(function(){
     Route::post("update/{id}", "Company\EmployeeController@update")->name("employee.update");
 });
 
+Route::prefix("leave")->middleware("auth")->group(function(){
+    Route::get("create", "Holidays\ManageHolidaysController@createLeave");
+    Route::post("store", "Holidays\ManageHolidaysController@storeLeave")->name("leave.store");
+});
+
 
 
 

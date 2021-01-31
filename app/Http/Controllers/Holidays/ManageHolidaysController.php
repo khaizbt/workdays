@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use DateTime;
 use DatePeriod;
 use Auth;
+use DB;
 use DateInterval;
+use App\Models\Employee;
+use App\Models\Holiday;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 
 class ManageHolidaysController extends Controller
 {
@@ -79,31 +83,74 @@ class ManageHolidaysController extends Controller
         $holidays = [];
 
         $data = $this->getApiHolidays();
-        // return $data;
-        // $array = array($data);
-        // return $array;
-
-        // return $data;
+        //TODO Cuti dalam 1 tahun, dan Karyawan dapat mengajukan Cuti
 
 
 
         foreach($this->getApiHolidays() as $key => $value){
                 $time = strtotime($key) ?? strtotime('20190101');
                 $events[] = [
-                  'title' =>  $value['deskripsi'] ?? 'tahun baru',
-                  'start' => date("Y-m-d", $time).' 19:00:00',
-                  'url' => 'https://www.google.com/search?q='.($value['deskripsi'] ?? 'https://www.google.com/search?q=tahun+baru')
+                    'title' =>  $value['deskripsi'] ?? 'tahun baru',
+                    'start' => date("Y-m-d", $time).' 19:00:00',
+                    'url' => 'https://www.google.com/search?q='.($value['deskripsi'] ?? 'https://www.google.com/search?q=tahun+baru')
 
                 ];
         }
 
-        // return $events;
-
-        // $user = Auth::user();
-
+        //TODO Event, Absen dan lain2 ditaruh sini
 
         return view('calendar.calendar', compact('events'));
     }
 
+    public function indexLeave(){ //Daftar Cuti dan Tidak Masuk kerja
+        // pHoli
+        //TODO CRUD Cuti
+    }
+
+    public function createLeave() {
+        $employee = Employee::whereHas("company", function($q){
+            $q->where("id_user", Auth::id());
+        })->get();
+
+        return view("leave.create", compact("employee"));
+    }
+
+    public function storeLeave(Request $request) {
+        $post = $request->except("_token");
+        // return $post;
+        DB::beginTransaction();
+        // try {
+            $post['employee_id'] = Crypt::decryptString($post['employee']);
+            $save = Holiday::create($post);
+            DB::commit();
+            return "success";
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return "fail";
+        // }
+
+    }
+
+    public function editLeave($id) {
+        $data = Holiday::where("id", $id)->with("employee")->first();
+
+        return view("leave.edit", compact("data"));
+    }
+
+    public function updateLeave(Request $request, $id){
+        $post = $request->except("_token", 'employee_id');
+
+        DB::beginTransaction();
+        try {
+            $update = Holiday::update($post);
+            DB::commit();
+            return "success";
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return "fail";
+        }
+    }
 
 }
+//TODO Notifikasi Karyawan Mengajukan Cuti, Terkena Denda, ataupun ada Event,
+//TODO Karyawan dapat Slip Gaji.

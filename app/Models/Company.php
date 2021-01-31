@@ -13,4 +13,8 @@ class Company extends Model
     public function user(){
         return $this->belongsTo('App\User', 'id_user');
     }
+
+    public function employee(){
+        return $this->hasOne('App\Models\Employee', 'company_id');
+    }
 }

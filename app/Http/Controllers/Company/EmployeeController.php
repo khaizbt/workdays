@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Employee;
+use App\Models\Employee;
 use App\User;
-use App\Company;
+use App\Models\Company;
 use Auth;
 use Hash;
 use DB;

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Company;
 use DataTables;
 use App\User;
+use App\Helpers\MyHelper;
 class ManageCompanyController extends Controller
 {
     public function index(){
@@ -44,7 +45,17 @@ class ManageCompanyController extends Controller
             'name' => 'required|unique:companies',
 
         ]);
-        $user = Company::create($request->all());
+        $post = $request->all();
+        // return $request->logo;
+        if($post['logo']) {
+            $upload = MyHelper::uploadFile($post['logo'], "company/logo/");
+
+            if($upload['status'] == "fail")
+                return redirect()->back()->withInput();
+
+                $post['logo'] = $upload['path'];
+        }
+        $user = Company::create($post);
         return response()->json($user);
     }
 
