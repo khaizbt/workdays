@@ -9,6 +9,7 @@ use App\Models\Company;
 use DataTables;
 use App\User;
 use App\Helpers\MyHelper;
+use App\Notifications\SubmitLeave;
 class ManageCompanyController extends Controller
 {
     public function index(){
@@ -55,8 +56,15 @@ class ManageCompanyController extends Controller
 
                 $post['logo'] = $upload['path'];
         }
-        $user = Company::create($post);
-        return response()->json($user);
+        $company = Company::create($post);
+        // $user = User::find($value['id_customer_analyst']);
+        $notification = [
+            'message' => "Company Has Been Craeted",
+            'url' => 'dashboard/pre-assesment',
+            'action_status' => 'Pra Penilaian'
+        ];
+        $company->user->notify(new SubmitLeave($notification));
+        return response()->json($company);
     }
 
     public function edit($id){
@@ -75,3 +83,6 @@ class ManageCompanyController extends Controller
 
 }
 
+
+//TODO Hitung Jumlah hari kerja di dashboard(Tidak dari klik kalender, list Holiday/Event bisa mencontoh company management)
+//TODO Download list gaji karyawan(sudah fixed, dan sudah dipotong karena pelanggaran)

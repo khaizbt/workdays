@@ -17,6 +17,6 @@ class Holiday extends Model
     ];
 
     public function employee() {
-        return $this->hasMany('App\Models\Employee', 'employee_id');
+        return $this->belongsTo('App\Models\Employee', 'employee_id');
     }
 }

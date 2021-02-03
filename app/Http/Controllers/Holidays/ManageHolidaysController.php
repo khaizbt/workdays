@@ -11,6 +11,10 @@ use DateInterval;
 use App\Models\Employee;
 use App\Models\Holiday;
 use Illuminate\Http\Request;
+use App\Notifications\SubmitLeave;
+use App\Notifications\AssignLeave;
+use App\Notifications\RejectLeave;
+use App\Notifications\ApproveLeave;
 use Illuminate\Support\Facades\Crypt;
 
 class ManageHolidaysController extends Controller
@@ -18,7 +22,6 @@ class ManageHolidaysController extends Controller
     public function getApiHolidays(){
         $str = file_get_contents('https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json');
 
-        // return $str;
         $json = json_decode($str, true);
 
         return $json;
@@ -34,10 +37,6 @@ class ManageHolidaysController extends Controller
         $date = [];
         $date_begin = strtotime($begin->format('Ymd'));
 
-        // return $date_begin;
-
-
-        // dd($what_day);
         $what_day = [];
         $no_days  = 0;
         foreach($daterange as $key => $value){
@@ -58,6 +57,10 @@ class ManageHolidaysController extends Controller
 
         return $no_days;
     }
+
+
+
+
 
     public function countWorking($startDate){
 
@@ -85,8 +88,6 @@ class ManageHolidaysController extends Controller
         $data = $this->getApiHolidays();
         //TODO Cuti dalam 1 tahun, dan Karyawan dapat mengajukan Cuti
 
-
-
         foreach($this->getApiHolidays() as $key => $value){
                 $time = strtotime($key) ?? strtotime('20190101');
                 $events[] = [
@@ -104,30 +105,43 @@ class ManageHolidaysController extends Controller
 
     public function indexLeave(){ //Daftar Cuti dan Tidak Masuk kerja
         // pHoli
-        //TODO CRUD Cuti
+        $data = Holiday::whereHas("employee", function($q)  {
+            $q->where("company_id", session("company_id"));
+        })->with('employee')->get();
+
+
+
+        return $data;
     }
 
     public function createLeave() {
-        $employee = Employee::whereHas("company", function($q){
-            $q->where("id_user", Auth::id());
-        })->get();
+        $employee = Employee::where("company_id", session("company_id"))->get();
+
+
 
         return view("leave.create", compact("employee"));
     }
 
     public function storeLeave(Request $request) {
         $post = $request->except("_token");
-        // return $post;
+
         DB::beginTransaction();
-        // try {
+        try {
             $post['employee_id'] = Crypt::decryptString($post['employee']);
             $save = Holiday::create($post);
+
+            $notification = [
+                'message' => "Your Leave has been assigned",
+                'url' => 'dashboard/pre-assesment',
+                'action_status' => 'Pra Penilaian'
+            ];
+            $save->employee->user->notify(new AssignLeave($notification));
             DB::commit();
             return "success";
-        // } catch (\Throwable $th) {
-        //     DB::rollback();
-        //     return "fail";
-        // }
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return "fail";
+        }
 
     }
 
@@ -151,6 +165,59 @@ class ManageHolidaysController extends Controller
         }
     }
 
+    public function summitLeave(Request $request) {
+        $post = $request->except("_token", "charge", "is_approved");
+
+        DB::beginTransaction();
+        try {
+            $post['employee_id'] = Auth::id();
+            $save = Holiday::create($post);
+
+            $notification = [
+                'message' => "Leave has been created",
+                'url' => 'dashboard/pre-assesment',
+                'action_status' => 'Pra Penilaian'
+            ];
+            $save->employee->user->notify(new SubmitLeave($notification));
+            DB::commit();
+
+            return true;
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return false;
+        }
+    }
+
+    public function approve($id) {
+        $data = Holiday::where("id", $id)->update(["is_approved" => 1]);
+
+        $notification = [
+            'message' => "Your Leave has been approved",
+            'url' => 'dashboard/pre-assesment',
+            'action_status' => 'Pra Penilaian'
+        ];
+        $data->employee->user->notify(new ApproveLeave($notification));
+    }
+
+    public function reject($id) {
+        $data = Holiday::where("id", $id)->update(['is_approved' => 0]);
+
+        $notification = [
+            'message' => "Your Leave has been rejected",
+            'url' => 'dashboard/pre-assesment',
+            'action_status' => 'Pra Penilaian'
+        ];
+        $save->employee->user->notify(new RejectLeave($notification));
+    }
+
+    public function listMyLeave() {
+        $data = Holiday::where("user_id", Auth::id())->get();
+
+        //datatable in here
+    }
 }
 //TODO Notifikasi Karyawan Mengajukan Cuti, Terkena Denda, ataupun ada Event,
 //TODO Karyawan dapat Slip Gaji.
+//TODO Pelanggaran
+//TODO Event
+//TODO Pengajuan Izin Keluar

@@ -35,8 +35,18 @@ Route::prefix("employee")->middleware("auth")->group(function(){
 Route::prefix("leave")->middleware("auth")->group(function(){
     Route::get("create", "Holidays\ManageHolidaysController@createLeave");
     Route::post("store", "Holidays\ManageHolidaysController@storeLeave")->name("leave.store");
+    Route::post("submit-leave", "Holidays\ManageHolidaysController@summitLeave")->name("submit.leave");
+    Route::post("approve", "Holidays\ManageHolidaysController@approve")->name("approve.leave");
+    Route::get('/', 'Holidays\ManageHolidaysController@indexLeave');
 });
 
+Route::prefix("ovense")->middleware("auth")->group(function(){
+    Route::get("/", "Company\OvenseController@index")->name("ovense.index");
+    Route::get("create", "Company\OvenseController@create")->name("ovense.create");
+    Route::post("store", "Company\OvenseController@store")->name("ovense.store");
+    Route::get("edit/{id}", "Company\OvenseController@edit")->name("ovense.edit");
+    Route::post("update/{id}", "Company\OvenseController@update")->name("ovense.update");
+});
 
 
 

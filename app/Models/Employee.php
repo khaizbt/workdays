@@ -15,8 +15,12 @@ class Employee extends Model
         "salary"
     ];
 
-    public function employee(){
-        return $this->belongsTo('App\Models\Holiday', 'employee_id');
+    public function holiday(){
+        return $this->hasMany('App\Models\Holiday', 'employee_id');
+    }
+
+    public function user() {
+        return $this->belongsTo('App\User', 'user_id');
     }
 
     public function company() {
