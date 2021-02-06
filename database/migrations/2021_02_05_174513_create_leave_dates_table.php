@@ -21,10 +21,10 @@ class CreateLeaveDatesTable extends Migration
             $table->foreign("leave_id")->references("id")->on("holidays")->onDelete("CASCADE")->onUpdate("CASCADE");
         });
 
-        Schema::table('holidays', function (Blueprint $table) {
-            $table->dropColumn("date_start");
-            $table->dropColumn("date_end");
-        });
+        // Schema::table('holidays', function (Blueprint $table) {
+        //     $table->dropColumn("date_start");
+        //     $table->dropColumn("date_end");
+        // });
     }
 
     /**

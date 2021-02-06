@@ -39,6 +39,7 @@ Dashboard
                             <div class="form-group">
                                 <label for="title">Company Name</label>
                                 <input type="text" class="form-control" name="name">
+                                <span>Nama Perusahaan Harus Unix</span>
                             </div>
                             <div class="form-group">
                                 <label for="admin">Admin</label>
@@ -52,43 +53,58 @@ Dashboard
                             <div class="form-group">
                                 <label for="logo">Logo</label>
                                 <input type="file" value="demo" name="logo" class="form-control">
+                                <span>Logo Ini akan dipakai pada Slip gaji karyawan dan sebagainya</span>
                             </div>
-
+                            <div class="form-group">
+                                <label for="title">Number Leave</label>
+                                <input type="number" min="1" class="form-control" name="number_leave">
+                                <span>Jumlah Cuti Pada 1 Tahun</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="title">Maximum Leave</label>
+                                <input type="number" min="1" class="form-control" name="maximum_leave">
+                                <span>Jumlah Maksimum Cuti yang boleh diambil dalam satu waktu</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="title">Date Salary</label>
+                                <input type="number" max="31" class="form-control" name="date_salary">
+                                <span>Tanggal dimana gaji dibayarkan ke karyawan setiap bulan</span>
+                            </div>
                             <div class="form-group">
                                 <label class="form-label">Hari Kerja</label>
                                 <div class="selectgroup selectgroup-pills">
                                 <label class="selectgroup-item">
-                                    <input type="checkbox" name="value" value="HTML" class="selectgroup-input" checked="">
+                                    <input type="checkbox" name="value[0]" value="1" class="selectgroup-input" checked="chacked">
                                     <span class="selectgroup-button">Senin</span>
                                 </label>
                                 <label class="selectgroup-item">
-                                    <input type="checkbox" name="value" value="CSS" class="selectgroup-input">
+                                    <input type="checkbox" name="value[1]" value="2" class="selectgroup-input">
                                     <span class="selectgroup-button">Selasa</span>
                                 </label>
                                 <label class="selectgroup-item">
-                                    <input type="checkbox" name="value" value="PHP" class="selectgroup-input">
+                                    <input type="checkbox" name="value[2]" value="3" class="selectgroup-input">
                                     <span class="selectgroup-button">Rabu</span>
                                 </label>
                                 <label class="selectgroup-item">
-                                    <input type="checkbox" name="value" value="JavaScript" class="selectgroup-input">
+                                    <input type="checkbox" name="value[3]" value="4" class="selectgroup-input">
                                     <span class="selectgroup-button">Kamis</span>
                                 </label>
                                 <label class="selectgroup-item">
-                                    <input type="checkbox" name="value" value="Ruby" class="selectgroup-input">
+                                    <input type="checkbox" name="value[4]" value="5" class="selectgroup-input">
                                     <span class="selectgroup-button">Jum'at</span>
                                 </label>
                                 <label class="selectgroup-item">
-                                    <input type="checkbox" name="value" value="Ruby" class="selectgroup-input">
+                                    <input type="checkbox" name="value[5]" value="6" class="selectgroup-input">
                                     <span class="selectgroup-button">Sabtu</span>
                                 </label>
                                 <label class="selectgroup-item">
-                                    <input type="checkbox" name="value" value="C++" class="selectgroup-input">
+                                    <input type="checkbox" name="value[6]" value="7" class="selectgroup-input">
                                     <span class="selectgroup-button">Minggu</span>
                                 </label>
                                 </div>
                                     <div class="control-label">Hari Libur</div>
                                     <label class="custom-switch mt-2">
-                                    <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input">
+                                    <input type="checkbox" name="work_holiday" class="custom-switch-input">
                                     <span class="custom-switch-indicator"></span>
                                     <span class="custom-switch-description">Diisi jika tanggal merah tetap masuk kerja</span>
                                     </label>

@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use DB;
 use App\Models\Company;
 use DataTables;
 use App\User;
+use App\Models\WorkDay;
 use App\Helpers\MyHelper;
 use App\Notifications\SubmitLeave;
 class ManageCompanyController extends Controller
@@ -44,10 +46,13 @@ class ManageCompanyController extends Controller
     public function store(Request $request){
         $request->validate([
             'name' => 'required|unique:companies',
+            // 'date_salary' =>required
 
         ]);
         $post = $request->all();
-        // return $request->logo;
+        // return $post;
+
+        DB::beginTransaction();
         if($post['logo']) {
             $upload = MyHelper::uploadFile($post['logo'], "company/logo/");
 
@@ -56,7 +61,18 @@ class ManageCompanyController extends Controller
 
                 $post['logo'] = $upload['path'];
         }
+
+        if(isset($post['work_holiday']) && $post['work_holiday'] == "on")
+            $post['work_holiday'] = 1;
+
         $company = Company::create($post);
+
+        foreach($post['value'] as $k => $v) {
+            $work_days = WorkDay::create([
+                'id_company' => $company['id'],
+                'days' => $v
+            ]);
+        }
         // $user = User::find($value['id_customer_analyst']);
         $notification = [
             'message' => "Company Has Been Craeted",
@@ -64,6 +80,7 @@ class ManageCompanyController extends Controller
             'action_status' => 'Pra Penilaian'
         ];
         $company->user->notify(new SubmitLeave($notification));
+        DB::commit();
         return response()->json($company);
     }
 

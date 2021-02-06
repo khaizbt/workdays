@@ -12,6 +12,7 @@ use App\Models\Employee;
 use App\Models\Holiday;
 use App\Models\Company;
 use App\Models\LeaveDate;
+use App\Models\WorkDay;
 use Illuminate\Http\Request;
 use App\Notifications\SubmitLeave;
 use App\Notifications\AssignLeave;
@@ -87,6 +88,15 @@ class ManageHolidaysController extends Controller
         $date = [];
         $date_begin = strtotime($begin->format('Ymd'));
 
+        $date_work = WorkDay::where('id_company', session('company_id'))->get()->toArray();
+
+        $days = [1, 2,3,4,5,6];
+
+        $day = array_splice($days,1, array_column($date_work, 'days'));
+
+
+
+        // return $days;
         $what_day = [];
         $no_days  = 0;
         foreach($daterange as $key => $value){
@@ -97,7 +107,7 @@ class ManageHolidaysController extends Controller
                 $date_holidays = strtotime($key1);
                 $is_holidays = date("N", $date_holidays);
 
-                    if(!in_array($is_holidays, [6,7])){ //TODO Konfigurasi Pengaturan Company untuk Libura dan lain-lain
+                    if(!in_array($is_holidays, $day)){ //TODO Konfigurasi Pengaturan Company untuk Libura dan lain-lain
                         $no_days++;
                     }
                 }
@@ -327,3 +337,4 @@ class ManageHolidaysController extends Controller
 //TODO Pelanggaran
 //TODO Event
 //TODO Pengajuan Izin Keluar
+//TODO List Gaji Karyawan perbulan, Jika tidak ada pelanggaran mengambil Gaji pada tabel karyawan, jika ada pelanggaran maka ambil data pada tabel gaji yang sudah dikurangi

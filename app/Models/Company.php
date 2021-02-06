@@ -8,7 +8,7 @@ class Company extends Model
 {
     protected $keyType = 'integer';
 
-    protected $fillable = ['id_user', 'name', 'logo'];
+    protected $fillable = ['id_user', 'name', 'logo', 'date_salary', 'number_leave', 'maximum_leave', 'date_salary', 'work_holiday'];
 
     public function user(){
         return $this->belongsTo('App\User', 'id_user');
