@@ -38,6 +38,8 @@ Route::prefix("leave")->middleware("auth")->group(function(){
     Route::post("submit-leave", "Holidays\ManageHolidaysController@summitLeave")->name("submit.leave");
     Route::post("approve", "Holidays\ManageHolidaysController@approve")->name("approve.leave");
     Route::get('/', 'Holidays\ManageHolidaysController@indexLeave');
+    Route::get("count-cuti", "Holidays\ManageHolidaysController@countHolidaysYear");
+    Route::get("count-cuti-employee", "Holidays\ManageHolidaysController@countHolidaysEmployee");
 });
 
 Route::prefix("ovense")->middleware("auth")->group(function(){

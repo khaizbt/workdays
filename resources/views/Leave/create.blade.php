@@ -3,7 +3,9 @@
 @section('title')
 Create Leave
 @endsection
-
+@section('style')
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+@endsection
 @section('content')
 <section class="section">
     <div class="section-header">
@@ -48,13 +50,13 @@ Create Leave
                                 <label for="title">Charge</label>
                                 <input type="number" class="form-control" name="charge">
                             </div>
-                            <div class="input-daterange input-group">
+                            <div class="form-group">
                                 <label for="">Date</label>
-                                <input type="date"  class="form-control" name="date_start">
-                                <div class="input-group-append">
+                                <input type="text" name="date" id="date_range"  class="form-control">
+                                {{-- <div class="input-group-append">
                                     <span class="input-group-text"><i class="la la-ellipsis-h"></i>To</span>
                                 </div>
-                                <input type="date" class="form-control" name="date_end">
+                                <input type="date" class="form-control" name="date_end"> --}}
                             </div>
                             <div class="form-group">
                                 <label for="title">Status</label>
@@ -80,10 +82,18 @@ Create Leave
 </section>
 @endsection
 @section('scripts')
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
     $( function() {
-    $( "#datepicker" ).datepicker();
-  } );
+    $( "#date_range" ).daterangepicker({
+        "minDate": moment(),
+        "maxSpan": {
+        "days": 2
+    },
+}, function(start, end, label) {
+  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+});
+    });
   </script>
 {{-- <script src="{{ asset("assets/js/page/datepicker.js") }}"></script> --}}
 @endsection

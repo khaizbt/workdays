@@ -10,6 +10,8 @@ use DB;
 use DateInterval;
 use App\Models\Employee;
 use App\Models\Holiday;
+use App\Models\Company;
+use App\Models\LeaveDate;
 use Illuminate\Http\Request;
 use App\Notifications\SubmitLeave;
 use App\Notifications\AssignLeave;
@@ -22,7 +24,55 @@ class ManageHolidaysController extends Controller
     public function getApiHolidays(){
         $str = file_get_contents('https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json');
 
+        // $holiday = Holiday::where('status', '!=', [3])->where('is_approved', 1)->with('employee')->get();
+
+        $holiday = LeaveDate::whereHas('leave', function($q) {
+            $q->where("status", '!=', 3)->where("is_approved", 1);
+        })->with('leave.employee')->get();
+
+        // $employee = Employee::get()->groupBy("name");
+
+        // return $employee;
+
+        // return $holiday;
+        $holidays = [];
+        foreach($holiday as $key => $val) {
+            $val['deskripsi'] = $val['leave']['employee']['name'];
+            if($val['leave']['status'] == 1)
+                $val['color'] = 'green';
+            elseif($val['leave']['status'] == 2)
+                $val['color'] = 'purple';
+            elseif($val['leave']['status'] == 4)
+                $val['status'] = '#a84632';
+            // unset($val['employee']);
+            $holidays[$val['id']] = $val;
+
+        }
+
+        // return $holidays;
+
+
+        $holiday_count = count($holiday);
+
+
         $json = json_decode($str, true);
+        // return $json;
+        $cuti = [];
+        foreach($json as $row => $value) {
+            if($row != "created-at"){
+                  $value['date'] = $row;
+
+            $cuti[$row] = $value;
+            }
+                // unset($row);
+            // return $value;
+
+        }
+
+        // return $cuti;
+
+        return $holidays + $cuti;
+
 
         return $json;
     }
@@ -47,7 +97,7 @@ class ManageHolidaysController extends Controller
                 $date_holidays = strtotime($key1);
                 $is_holidays = date("N", $date_holidays);
 
-                    if(!in_array($is_holidays, [6,7])){
+                    if(!in_array($is_holidays, [6,7])){ //TODO Konfigurasi Pengaturan Company untuk Libura dan lain-lain
                         $no_days++;
                     }
                 }
@@ -88,12 +138,13 @@ class ManageHolidaysController extends Controller
         $data = $this->getApiHolidays();
         //TODO Cuti dalam 1 tahun, dan Karyawan dapat mengajukan Cuti
 
-        foreach($this->getApiHolidays() as $key => $value){
-                $time = strtotime($key) ?? strtotime('20190101');
+        foreach($data as $key => $value){
+                $time = strtotime($value['date']) ?? strtotime('20190101');
                 $events[] = [
                     'title' =>  $value['deskripsi'] ?? 'tahun baru',
                     'start' => date("Y-m-d", $time).' 19:00:00',
-                    'url' => 'https://www.google.com/search?q='.($value['deskripsi'] ?? 'https://www.google.com/search?q=tahun+baru')
+                    'url' => 'https://www.google.com/search?q='.($value['deskripsi'] ?? 'https://www.google.com/search?q=tahun+baru'),
+                    "color" => $value['color'] ?? '',
 
                 ];
         }
@@ -124,11 +175,32 @@ class ManageHolidaysController extends Controller
 
     public function storeLeave(Request $request) {
         $post = $request->except("_token");
+        $begin = new DateTime("2021-01-01");
+        $end = new DateTime("2021-01-01");
+        $end = $end->modify( '+1 day' );
 
+        $interval = DateInterval::createFromDateString('1 day');
+        $period = new DatePeriod($begin, $interval, $end);
+
+        // dd($period);
+        // foreach($period as $k => $v) {
+        //     $post['date2'][$k] = $v->format("Y-m-d");
+        // }
+
+        // return $post;
         DB::beginTransaction();
-        try {
+        // try {
             $post['employee_id'] = Crypt::decryptString($post['employee']);
             $save = Holiday::create($post);
+            // return $save;
+            if($save){
+                foreach($period as $k => $v) {
+                    $save_date = LeaveDate::create([
+                        "leave_id" => $save['id'],
+                        "date" =>  $v->format("Y-m-d"),
+                    ]);
+                }
+            }
 
             $notification = [
                 'message' => "Your Leave has been assigned",
@@ -138,10 +210,10 @@ class ManageHolidaysController extends Controller
             $save->employee->user->notify(new AssignLeave($notification));
             DB::commit();
             return "success";
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return "fail";
-        }
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return "fail";
+        // }
 
     }
 
@@ -215,6 +287,40 @@ class ManageHolidaysController extends Controller
 
         //datatable in here
     }
+
+    public function countHolidaysYear($jumlah = null) { //Menghitung Cuti Bersama dalam satu tahun
+        $data = $this->getApiHolidays();
+
+        $cuti = [];
+        foreach($data as $key => $val) {
+            // return $val;
+            if(substr($key,0,4) == date("Y")) {
+                if(strpos($val['deskripsi'], "Cuti Bersama") !== false) {
+                    $cuti[$key] = $val;
+                }
+            }
+        }
+
+        if($jumlah != null)
+            return $cuti;
+
+        return count($cuti);
+    }
+
+    public function countHolidaysEmployee() {
+        $company = Company::where("id", session("company_id"))->first();
+
+        $number_leave = 14-$this->countHolidaysYear();
+
+        $number_leave_employee = Employee::where("user_id", Auth::id())->first();
+        // return $number_leave_employee;
+        $leave = Holiday::where("employee_id", $number_leave_employee['id'])->where("is_approved", 1)->whereYear("created_at", 2021)->get();
+
+        return $leave;
+
+    }
+
+    // public function
 }
 //TODO Notifikasi Karyawan Mengajukan Cuti, Terkena Denda, ataupun ada Event,
 //TODO Karyawan dapat Slip Gaji.
