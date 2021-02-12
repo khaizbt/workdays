@@ -12,6 +12,8 @@ use App\User;
 use App\Models\WorkDay;
 use App\Helpers\MyHelper;
 use App\Notifications\SubmitLeave;
+use Illuminate\Support\Facades\Crypt;
+
 class ManageCompanyController extends Controller
 {
     public function index(){
@@ -23,17 +25,18 @@ class ManageCompanyController extends Controller
     public function data(Request $request){
         $post = $request->all();
         if($request->ajax()) {
-            $data = Company::all();
-
-            // return $data;
+            $data = Company::with('user')->get();
 
             return Datatables::of($data)
                 ->addColumn('action', function ($data) {
                     return "<a href='".route('company.edit', [$data['id']])."'><i class='fa fa-envelope text-info btn-email'></i></a>
-                    | <a href='".route('company.destroy', [$data['id']])."' class='btn-delete' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+                    | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+            })->addColumn("user_name", function($row){
+               return $row['user']['name'];
             })
+            // href='".route('company.destroy', [Crypt::decrypt($data['id'])])."'
             ->addIndexColumn()
-                ->rawColumns(['action'])
+                ->rawColumns(['action', 'user_name'])
                 ->make(true);
         }
     }
@@ -85,17 +88,46 @@ class ManageCompanyController extends Controller
     }
 
     public function edit($id){
-        $data = Company::where('id', $id)->first();
+        $data = Company::where('id', $id)->with("work_days")->first();
         $user = User::where('level', 2)->get();
-
+        // return $data;
         return view('admin.company.edit')->with('data', $data)->with('user', $user);
     }
 
     public function update(Request $request, $id){
-        $update = Company::where('id', $id)
-            ->update(['name' => $request->name, 'id_user' => $request->id_user, 'logo' => $request->logo]);
+        $post = $request->except('id', "_token");
+        $post['id_user'] = Crypt::decrypt($post['id_user']);
+        if(isset($post['work_holiday']) && $post['work_holiday'] == "on")
+        $post['work_holiday'] = 1;
 
-        return 'Sukses';
+        if(isset($post['logo'])) {
+            $upload = MyHelper::uploadFile($post['logo'], "company/logo/");
+
+            if($upload['status'] == "fail")
+                return redirect()->back()->withInput();
+
+                $post['logo'] = $upload['path'];
+        }
+        DB::beginTransaction();
+        $delete = WorkDay::where("id_company", $id)->delete();
+        foreach($post['value'] as $k => $v) {
+            $work_days = WorkDay::create([
+                'id_company' => $id,
+                'days' => $v
+            ]);
+        }
+
+
+        unset($post['value']);
+        $update = Company::where('id', $id)
+            ->update($post);
+            DB::commit();
+        return redirect('/company')->with(['success' => 'Data Company has been updated']);
+
+    }
+
+    public function destroy($id) {
+        return Company::where("id", $id)->delete();
     }
 
 }

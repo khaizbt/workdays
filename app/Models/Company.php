@@ -17,4 +17,8 @@ class Company extends Model
     public function employee(){
         return $this->hasOne('App\Models\Employee', 'company_id');
     }
+
+    public function work_days() {
+        return $this->hasMany("App\Models\WorkDay", 'id_company');
+    }
 }

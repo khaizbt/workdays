@@ -5,6 +5,8 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
   <title>@yield('title', 'Stisla Laravel') &mdash; {{ env('APP_NAME') }}</title>
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="url" content="{{ url('/') }}">
+
   <!-- General CSS Files -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="{{ asset('assets/css/datatables/datatables.min.css') }}">
@@ -51,6 +53,7 @@
   <script src="{{ asset('assets/js/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script src="{{ asset('assets/js/datatables/dataTables.select.min.js') }}"></script>
   <script src="{{ asset('assets/js/page/select2.full.min.js') }}"></script>
+  <script src="assets/modules/sweetalert.min.js"></script>
   @yield('scripts')
 </body>
 </html>

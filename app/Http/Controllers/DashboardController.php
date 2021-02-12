@@ -7,6 +7,8 @@ use App\User;
 use App\Models\Company;
 use App\Models\Employee;
 use Auth;
+use Storage;
+use Image;
 
 class DashboardController extends Controller
 {
@@ -31,5 +33,12 @@ class DashboardController extends Controller
             session(["company_id" => $employee['company_id']]);
         }
         return view('admin.dashboard.index');
+    }
+
+    public function getFile($file){
+        $file_storage = str_replace('+', '/', $file);
+        $file = Storage::disk('local')->get($file_storage);
+
+        return Image::make($file)->response();
     }
 }

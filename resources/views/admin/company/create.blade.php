@@ -46,7 +46,7 @@ Dashboard
                                 <select name="id_user" id="select2" class="form-control">
                                     <option value="">Choose Admin</option>
                                     @foreach($user as $key => $value)
-                                        <option value="{{$value['id']}}">{{$value['name']}}</option>
+                                        <option value="{{ Illuminate\Support\Facades\Crypt::encryptString($value['id'])}}">{{$value['name']}}</option>
                                     @endforeach
                                 </select>
                             </div>

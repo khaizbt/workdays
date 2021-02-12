@@ -13,7 +13,9 @@ use DB;
 class EmployeeController extends Controller
 {
     public function index() {
+        $is_data_empty = Employee::where('company_id', session('company_id'))->get()->count() == 0 ? true : false;
 
+        return view('employee.index', ['is_data_empty' => $is_data_empty]);
     }
 
     public function create() {

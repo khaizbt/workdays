@@ -17,7 +17,7 @@ class Company extends Model
 {
     /**
      * The "type" of the auto-incrementing ID.
-     * 
+     *
      * @var string
      */
     protected $keyType = 'integer';
@@ -34,4 +34,6 @@ class Company extends Model
     {
         return $this->belongsTo('App\User', 'id_user');
     }
+
+
 }

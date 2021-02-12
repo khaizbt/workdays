@@ -23,5 +23,5 @@ class Holiday extends Model
     public function leave_date(){
         return $this->hasOne("App\Models\LeaveDate", "leave_id");
     }
-    //TODO GEt date from holoiday date
+
 }

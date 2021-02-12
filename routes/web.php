@@ -7,6 +7,7 @@ Route::get('home', function() {
     return redirect(route('admin.dashboard'));
 });
 
+Route::get("file/{file}", "DashboardController@getFile")->name('get.file')->middleware("auth");
 Route::get("salary", "Holidays\ManageHolidaysController@countSalaryEmployee")->middleware("auth");
 Route::prefix('holidays')->group(function() {
     Route::get('/', 'Holidays\ManageHolidaysController@index')->name("holiday.index");
