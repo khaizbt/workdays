@@ -19,17 +19,17 @@ Create Leave
         <div class="row">
             <div class="col-md-8 col-sm-12">
                 <div class="card">
-                    <form action="{{route('leave.store')}}" method="POST">
+                    <form action="{{route('ovense.store')}}" method="POST">
                         @csrf
                         <div class="card-header"><h4>Add a New Company</h4></div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="title">Leave Name</label>
-                                <input type="text" class="form-control" name="leave_name">
+                                <label for="title">Ovense Name</label>
+                                <input type="text" class="form-control" name="ovense_name">
                             </div>
                             <div class="form-group">
                                 <label for="title">Employee</label>
-                                <select name="employee" id="select2" class="form-control">
+                                <select name="employee_id" id="select2" class="form-control">
                                     <option value="">Choose Employee</option>
                                     @foreach($employee as $key => $value)
                                         <option value="{{ Illuminate\Support\Facades\Crypt::encryptString($value['id']) }}">{{$value['name']}}</option>
@@ -37,37 +37,27 @@ Create Leave
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="title">Leave Type</label>
-                                <select name="status" class="form-control">
+                                <label for="title">Pinalty Type</label>
+                                <select name="pinalty_type" class="form-control">
                                     <option value="">Chossee Type</option>
-                                    <option value="1">Cuti</option>
-                                    <option value="2">Sakit</option>
-                                    <option value="3">Alpha</option>
-                                    <option value="4">Izin</option>
+                                    <option value="Sanksi Lisan">Teguran</option>
+                                    <option value="Denda">Potong Gaji</option>
+                                    <option value="Penambahan Jam Kerja">Penambahan Jam Kerja</option>
+                                    <option value="Skorsing">Skorsing</option>
+                                    <option value="Pecat">Pemecatan</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label for="title">Charge</label>
-                                <input type="number" class="form-control" name="charge">
+                            <div class="form-group" id="punishment">
+                                <label for="title">Punishment</label>
+                                <input type="number" class="form-control" name="punishment">
                             </div>
                             <div class="form-group">
                                 <label for="">Date</label>
-                                <input type="date" name="date_start"  class="form-control">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="la la-ellipsis-h"></i>To</span>
-                                </div>
-                                <input type="date" class="form-control" name="date_end">
-                            </div>
-                            <div class="form-group">
-                                <label for="title">Status</label>
-                                <select name="is_approved" class="form-control">
-                                    <option value="">Chossee Status</option>
-                                    <option value="1">Approved</option>
-                                    <option value="0">No Approved</option>
-                                    <option value="2">Pending</option>
+                                <input type="date" name="date"  class="form-control">
 
-                                </select>
                             </div>
+
                         </div>
                             <div class="card-footer">
                                 <button class="btn btn-primary mr-1" type="submit">Submit</button>

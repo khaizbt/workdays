@@ -12,6 +12,10 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request)
     {
+        // return Auth::user()->unreadNotifications[0];
+        // foreach(Auth::user()->unreadNotifications as $key => $value){
+        //     return $value['data']['message'];
+        // }
         $user = User::where('id', Auth::id())->first();
 
         if($user['level'] == 2) {

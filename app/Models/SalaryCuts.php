@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmployeeSalary extends Model
+class SalaryCuts extends Model
 {
     protected $fillable = [
         "employee_id",
-        "month",
-        "year",
-        "salary"
+        "cuts_name",
+        "notes",
+        "image",
+        "value",
+        "status"
     ];
 }

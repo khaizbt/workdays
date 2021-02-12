@@ -4,6 +4,7 @@ namespace App\Helpers;
 use File;
 use Storage;
 use Image;
+use App\Models\Employee;
 
 class MyHelper {
     static function uploadFile($image, $path="/",$resize=1000) {
@@ -40,5 +41,15 @@ class MyHelper {
                 "status" => "fail"
             ];
         }
+    }
+
+    static function validationEmployee($employee_id, $company_id) {
+        $data = Employee::where("id", $employee_id)->where("company_id", $company_id)->first();
+
+        if($data){
+            return true;
+        }
+
+        return false;
     }
 }

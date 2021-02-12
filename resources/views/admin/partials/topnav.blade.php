@@ -15,22 +15,22 @@
     <div class="dropdown-menu dropdown-list dropdown-menu-right">
       <div class="dropdown-header">Notifications
         <div class="float-right">
-          <a href="#">Mark All As Read</a>
+          <a href="{{ route('notif.read.all') }}">Mark All As Read</a>
         </div>
       </div>
       <div class="dropdown-list-content dropdown-list-icons">
         @if(Auth::user()->unreadNotifications->count())
-        @for($i = 1; $i < 40; $i++)
-        <a href="#" class="dropdown-item dropdown-item-unread">
+        @foreach(Auth::user()->unreadNotifications as $key => $value)
+          <a href="{{ route('notif.read',Illuminate\Support\Facades\Crypt::encrypt($value['id'])) }}" class="dropdown-item dropdown-item-unread">
           <div class="dropdown-item-icon bg-primary text-white">
             <i class="fas fa-code"></i>
           </div>
           <div class="dropdown-item-desc">
-            Template update is available now!
-            <div class="time text-primary">2 Min Ago</div>
+            {{ $value['data']['message'] }}
+            <div class="time text-primary">{{ $value['created_at'] }}</div>
           </div>
         </a>
-        @endfor
+        @endforeach
         @else
         <p class="text-muted p-2 text-center">No notifications found!</p>
         @endif

@@ -23,7 +23,15 @@ class Employee extends Model
         return $this->belongsTo('App\User', 'user_id');
     }
 
+    public function ovense() {
+        return $this->hasMany("App\Models\Ovense", "employee_id");
+    }
+
     public function company() {
         return $this->belongsTo("App\Models\Company", "company_id");
+    }
+
+    public function holiday_paid() {
+        return $this->hasMany('App\Models\Holiday', 'employee_id')->whereNotNull("charge");
     }
 }

@@ -7,7 +7,7 @@ Route::get('home', function() {
     return redirect(route('admin.dashboard'));
 });
 
-
+Route::get("salary", "Holidays\ManageHolidaysController@countSalaryEmployee")->middleware("auth");
 Route::prefix('holidays')->group(function() {
     Route::get('/', 'Holidays\ManageHolidaysController@index')->name("holiday.index");
     Route::get('count-working/{startDate}', 'Holidays\ManageHolidaysController@countWorking')->name('holiday.count.working');
@@ -30,6 +30,7 @@ Route::prefix("employee")->middleware("auth")->group(function(){
     Route::post("store", "Company\EmployeeController@store")->name("employee.store");
     Route::get("edit/{id}", "Company\EmployeeController@edit")->name("employee.edit");
     Route::post("update/{id}", "Company\EmployeeController@update")->name("employee.update");
+    Route::get("salary", "Holidays\ManageHolidaysController@countSalaryEmployeeAll");
 });
 
 Route::prefix("leave")->middleware("auth")->group(function(){
@@ -50,9 +51,21 @@ Route::prefix("ovense")->middleware("auth")->group(function(){
     Route::post("update/{id}", "Company\OvenseController@update")->name("ovense.update");
 });
 
+Route::prefix("salary-cut")->middleware("auth")->group(function(){
+    Route::get("/", "Company\SalaryCutController@index")->name("salarycut.index");
+    Route::get("create", "Company\SalaryCutController@create")->name("salarycut.create");
+    Route::post("store", "Company\SalaryCutController@store")->name("salarycut.store");
+});
 
+Route::prefix("notification")->middleware("auth")->group(function(){
+    Route::get("read/{id}", "NotificationController@readNotif")->name("notif.read");
+    Route::get("read-all", 'NotificationController@readNotifAll')->name('notif.read.all');
+});
 
-
+Route::prefix("event")->middleware("auth")->group(function(){
+    Route::get("create", "EventController@create")->name("event.create");
+    Route::post("store", "EventController@store")->name("event.store");
+});
 
 
 

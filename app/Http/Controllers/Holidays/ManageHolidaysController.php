@@ -13,6 +13,7 @@ use App\Models\Holiday;
 use App\Models\Company;
 use App\Models\LeaveDate;
 use App\Models\WorkDay;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Notifications\SubmitLeave;
 use App\Notifications\AssignLeave;
@@ -31,11 +32,17 @@ class ManageHolidaysController extends Controller
             $q->where("status", '!=', 3)->where("is_approved", 1);
         })->with('leave.employee')->get();
 
-        // $employee = Employee::get()->groupBy("name");
+        $event = Event::where("company_id", session("company_id"))->get();
+        $events = [];
 
-        // return $employee;
+        foreach($event as $k => $v) {
+            $v['deskripsi'] = $v['event_name'];
+            $v['color'] = "#fc0356";
+            $v['date'] = $v['time'];
 
-        // return $holiday;
+            $events[strtotime($v['created_at'])] = $v;
+        }
+
         $holidays = [];
         foreach($holiday as $key => $val) {
             $val['deskripsi'] = $val['leave']['employee']['name'];
@@ -72,7 +79,7 @@ class ManageHolidaysController extends Controller
 
         // return $cuti;
 
-        return $holidays + $cuti;
+        return $holidays + $cuti + $events;
 
 
         return $json;
@@ -117,13 +124,8 @@ class ManageHolidaysController extends Controller
 
         return $no_days;
     }
-
-
-
-
-
     public function countWorking($startDate){
-
+        return $startDate;
         $begin = strtotime($startDate);
         $end_date =  strtotime(date('Ymd',strtotime('+1 month',$begin)));
         $last_day = date('Ymd',strtotime('-1 days',$end_date));
@@ -185,8 +187,8 @@ class ManageHolidaysController extends Controller
 
     public function storeLeave(Request $request) {
         $post = $request->except("_token");
-        $begin = new DateTime("2021-01-01");
-        $end = new DateTime("2021-01-01");
+        $begin = new DateTime($post['date_start']);
+        $end = new DateTime($post['date_end']);
         $end = $end->modify( '+1 day' );
 
         $interval = DateInterval::createFromDateString('1 day');
@@ -330,6 +332,126 @@ class ManageHolidaysController extends Controller
 
     }
 
+    public function countSalaryEmployeeAll($month = null) {
+        $company = Company::where("id", session("company_id"))->first();
+
+
+        for($i = 1; $i <= 12; $i++){
+            if($month == $i) {
+                $date = date('Y-'.$i.'-'.$company['date_salary']);
+                $begin = date('Y-m-d',strtotime('-1 days',strtotime($date)));
+                break;
+            } elseif($month == null) {
+                $begin = date('Y-m-'.$company['date_salary']);
+            }
+        }
+
+
+        // if($company['date_salary'] > date('d')){
+        if($company['date_salary'] > date('d') && $month == null){
+            $begin_date = date('Y-m-'.$company['date_salary']);
+            $date_str =  strtotime(date('Ymd',strtotime('-1 month',strtotime($begin))));
+            $begin = date('Y-m-d',strtotime('-1 days',$date_str));
+        }
+
+            // return $begin;
+        $end_date =  strtotime(date('Ymd',strtotime('+1 month',strtotime($begin))));
+        $last_day = date('Y-m-d',strtotime('-1 days',$end_date));
+        $end   = strtotime($last_day);
+
+        $employee = Employee::where('company_id', session("company_id"))->with(['ovense' => function($q) use($begin, $last_day){
+            $q->whereBetween("date", [$begin, $last_day]);
+        }])->with(['holiday_paid' => function($query) use($begin, $last_day){
+            $query->whereHas("leave_date", function($que) use($begin, $last_day){
+                $que->whereBetween("date", [$begin, $last_day]);
+            });
+        }])->get();
+
+        // return $employee;
+
+        foreach($employee as $key => $value){
+            $sum_ovense = 0;
+            $sum_holiday_paid = 0;
+
+            foreach($value['ovense'] as $key1 => $value1){
+                // return $value1['punishment'];
+                $sum_ovense += $value1['punishment'];
+                $employee[$key]['punishment_total'] = $sum_ovense;
+                // $employee[$key]['salary_fix'] = $value['salary'] - $sum_ovense;
+            }
+
+            foreach($value['holiday_paid'] as $key2 => $value2) {
+                $sum_holiday_paid += $value2['charge'];
+                $employee[$key]['holiday_paid_total'] = $sum_holiday_paid;
+            }
+
+            $employee[$key]['salary_fix'] = $value['salary'] - $sum_ovense - $sum_holiday_paid;
+
+        // }
+
+        }
+        return $employee;
+
+    }
+
+    public function countSalaryEmployee($month = null) {
+        $company = Company::where("id", session("company_id"))->first();
+
+
+        for($i = 1; $i <= 12; $i++){
+            if($month == $i) {
+                $date = date('Y-'.$i.'-'.$company['date_salary']);
+                $begin = date('Y-m-d',strtotime('-1 days',strtotime($date)));
+                break;
+            } elseif($month == null) {
+                $begin = date('Y-m-'.$company['date_salary']);
+            }
+        }
+
+        if($company['date_salary'] > date('d') && $month == null){
+            $begin_date = date('Y-m-'.$company['date_salary']);
+            $date_str =  strtotime(date('Ymd',strtotime('-1 month',strtotime($begin))));
+            $begin = date('Y-m-d',strtotime('-1 days',$date_str));
+        }
+            // return $begin;
+        $end_date =  strtotime(date('Ymd',strtotime('+1 month',strtotime($begin))));
+        $last_day = date('Y-m-d',strtotime('-1 days',$end_date));
+        $end   = strtotime($last_day);
+
+        return $last_day;
+        $employee = Employee::where('user_id', Auth::id())->with(['ovense' => function($q) use($begin, $last_day){
+            $q->whereBetween("date", ["2021-02-01", $last_day]);
+        }])->with(['holiday_paid' => function($query) use($begin, $last_day){
+            $query->whereHas("leave_date", function($que) use($begin, $last_day){
+                $que->whereBetween("date", ["2021-01-01", $last_day]);
+            });
+        }])->first();
+
+        // foreach($employee as $key => $value){
+            $sum_ovense = 0;
+            $sum_holiday_paid = 0;
+
+            foreach($employee['ovense'] as $key1 => $value1){
+                // return $value1['punishment'];
+                $sum_ovense += $value1['punishment'];
+                $employee['punishment_total'] = $sum_ovense;
+                // $employee['salary_fix'] = $value['salary'] - $sum_ovense;
+            }
+
+            foreach($employee['holiday_paid'] as $key2 => $value2) {
+                $sum_holiday_paid += $value2['charge'];
+                $employee['holiday_paid_total'] = $sum_holiday_paid;
+            }
+
+            $employee['salary_fix'] = $employee['salary'] - $sum_ovense - $sum_holiday_paid;
+
+        // }
+
+        // }
+        return $employee;
+
+    }
+
     // public function
 }
 //TODO Notifikasi Karyawan Mengajukan Cuti, Terkena Denda, ataupun ada Event,
@@ -338,3 +460,4 @@ class ManageHolidaysController extends Controller
 //TODO Event
 //TODO Pengajuan Izin Keluar
 //TODO List Gaji Karyawan perbulan, Jika tidak ada pelanggaran mengambil Gaji pada tabel karyawan, jika ada pelanggaran maka ambil data pada tabel gaji yang sudah dikurangi
+//TODO Potongan Perbulan

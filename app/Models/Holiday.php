@@ -19,4 +19,9 @@ class Holiday extends Model
     public function employee() {
         return $this->belongsTo('App\Models\Employee', 'employee_id');
     }
+
+    public function leave_date(){
+        return $this->hasOne("App\Models\LeaveDate", "leave_id");
+    }
+    //TODO GEt date from holoiday date
 }

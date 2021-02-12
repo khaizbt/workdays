@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OvensePublish extends Notification
+class SalaryCuts extends Notification
 {
     use Queueable;
 
@@ -16,10 +16,9 @@ class OvensePublish extends Notification
      *
      * @return void
      */
-    protected $ovense;
-    public function __construct($ovense)
+    public function __construct()
     {
-        $this->ovense = $ovense;
+        //
     }
 
     /**
@@ -30,7 +29,7 @@ class OvensePublish extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['mail'];
     }
 
     /**
@@ -58,10 +57,5 @@ class OvensePublish extends Notification
         return [
             //
         ];
-    }
-
-    public function toDatabase($notifiable)
-    {
-        return $this->ovense;
     }
 }

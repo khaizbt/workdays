@@ -19,17 +19,21 @@ Create Leave
         <div class="row">
             <div class="col-md-8 col-sm-12">
                 <div class="card">
-                    <form action="{{route('leave.store')}}" method="POST">
+                    <form action="{{route('salarycut.store')}}" enctype="multipart/form-data" method="POST">
                         @csrf
                         <div class="card-header"><h4>Add a New Company</h4></div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="title">Leave Name</label>
-                                <input type="text" class="form-control" name="leave_name">
+                                <label for="title">Salary Cut Name</label>
+                                <input type="text" class="form-control" name="cuts_name">
+                            </div>
+                            <div class="form-group">
+                                <label for="notes">Notes</label>
+                                <textarea name="notes" id="" class="form-control" cols="30" rows="10"></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="title">Employee</label>
-                                <select name="employee" id="select2" class="form-control">
+                                <select name="employee_id" id="select2" class="form-control">
                                     <option value="">Choose Employee</option>
                                     @foreach($employee as $key => $value)
                                         <option value="{{ Illuminate\Support\Facades\Crypt::encryptString($value['id']) }}">{{$value['name']}}</option>
@@ -37,37 +41,23 @@ Create Leave
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="title">Leave Type</label>
+                                <label for="image">Image</label>
+                                <input type="file" class="form-control" name="image" id="">
+                            </div>
+                            <div class="form-group">
+                                <label for="value">Value</label>
+                                <input type="number"  class="form-control"name="value" id="">
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Status</label>
                                 <select name="status" class="form-control">
-                                    <option value="">Chossee Type</option>
-                                    <option value="1">Cuti</option>
-                                    <option value="2">Sakit</option>
-                                    <option value="3">Alpha</option>
-                                    <option value="4">Izin</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="title">Charge</label>
-                                <input type="number" class="form-control" name="charge">
-                            </div>
-                            <div class="form-group">
-                                <label for="">Date</label>
-                                <input type="date" name="date_start"  class="form-control">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="la la-ellipsis-h"></i>To</span>
-                                </div>
-                                <input type="date" class="form-control" name="date_end">
-                            </div>
-                            <div class="form-group">
-                                <label for="title">Status</label>
-                                <select name="is_approved" class="form-control">
                                     <option value="">Chossee Status</option>
-                                    <option value="1">Approved</option>
-                                    <option value="0">No Approved</option>
-                                    <option value="2">Pending</option>
-
+                                    <option value="0">Dipotong 1x</option>
+                                    <option value="1">Dipotong Perbulan</option>
                                 </select>
                             </div>
+
+
                         </div>
                             <div class="card-footer">
                                 <button class="btn btn-primary mr-1" type="submit">Submit</button>
