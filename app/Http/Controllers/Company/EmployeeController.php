@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\User;
 use App\Models\Company;
+use App\Helpers\MyHelper;
+use DataTables;
+
 use Auth;
 use Hash;
 use DB;
@@ -16,6 +19,21 @@ class EmployeeController extends Controller
         $is_data_empty = Employee::where('company_id', session('company_id'))->get()->count() == 0 ? true : false;
 
         return view('employee.index', ['is_data_empty' => $is_data_empty]);
+    }
+
+    public function data(Request $request) {
+
+        if($request->ajax()) {
+            $data = Employee::where('company_id', session('company_id'))->get();
+            return Datatables::of($data)
+                ->addColumn('action', function ($data) {
+                    return "<a href='".route('employee.edit', [$data['id']])."'><i class='fa fa-edit text-info'></i></a>
+                    | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+            })
+            ->addIndexColumn()
+                ->rawColumns(['action'])
+                ->make(true);
+        }
     }
 
     public function create() {
@@ -57,7 +75,10 @@ class EmployeeController extends Controller
 
     public function edit($id) {
         $employee = Employee::where('id', $id)->first();
-
+        $validate = MyHelper::validationEmployee($id, session("company_id"));
+        if($validate == false) {
+            return redirect('/employee')->with(['error' => 'Data Company has been updated']);
+        }
         $user = User::where('id', $employee['user_id'])->first();
 
         return view("employee.edit")->with(['user' => $user, 'employee' => $employee]);
@@ -65,19 +86,26 @@ class EmployeeController extends Controller
 
     public function update(Request $request, $id) {
         $post = $request->except("_token", 'user_id');
-
-
+        $validate = MyHelper::validationEmployee($id, session("company_id"));
+        if($validate == false) {
+            return redirect('/employee')->with(['error' => 'Data Company has been updated']);
+        }
 
         DB::beginTransaction();
         try {
 
             $employee = Employee::where('id', $id)->first();
 
-            $update = $employee->update($post);
+            $update = $employee->update([
+                "name" => $post['name'],
+                "position" => $post['position'],
+                "status" => $post['status'],
+                "salary" => $post['salary']
+            ]);
 
             $user = User::where('id', $employee['user_id'])->first();
 
-            $update_user = $user->update(["email" => $post['email']]);
+            $update_user = $user->update(["email" => $post['email'], "name" => $post['name']]);
 
             if(isset($post['password']) && $post['password'] != null) {
                 $user->update(["password" => \Hash::make($post['password'])]);
@@ -97,7 +125,7 @@ class EmployeeController extends Controller
             User::where("id", $employee['user_id'])->delete();
             $delete = $employee->delete();
             DB::commit();
-            return "success";
+            return 1;
         } catch (\Throwable $th) {
             //throw $th;
         }

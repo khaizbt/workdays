@@ -24,4 +24,8 @@ class Holiday extends Model
         return $this->hasOne("App\Models\LeaveDate", "leave_id");
     }
 
+    public function leave_date_all(){
+        return $this->hasMany("App\Models\LeaveDate", "leave_id");
+    }
+
 }

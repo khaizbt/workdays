@@ -8,6 +8,7 @@ use DatePeriod;
 use Auth;
 use DB;
 use DateInterval;
+use DataTables;
 use App\Models\Employee;
 use App\Models\Holiday;
 use App\Models\Company;
@@ -168,13 +169,33 @@ class ManageHolidaysController extends Controller
 
     public function indexLeave(){ //Daftar Cuti dan Tidak Masuk kerja
         // pHoli
-        $data = Holiday::whereHas("employee", function($q)  {
+        $holiday = Holiday::whereHas("employee", function($q)  {
             $q->where("company_id", session("company_id"));
-        })->with('employee')->get();
+        })->where('is_approved', 2)->with('employee')->get();
 
+        $is_data_empty = $holiday->count() == 0 ? true : false;
 
+        return view('leave.index', ['is_data_empty' => $is_data_empty, "holiday" => $holiday]);
+    }
 
-        return $data;
+    public function dataLeave(Request $request){
+        // if($request->ajax()) {
+            $data = Holiday::whereHas("employee", function($q){
+                $q->where("company_id", session("company_id"));
+            })->with("employee")->get();
+            return Datatables::of($data)
+            ->addColumn('action', function ($data) {
+                return "<a href='".route('leave.edit', [$data['id']])."'><i class='fa fa-edit text-info'></i></a>
+                | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+            })->addColumn('status_str', function($row){
+                return ($row['status'] == 1) ? "Cuti" : "Lainnya";
+            })->addColumn('approved_str', function($row){
+                return ($row['is_approved'] == 1) ? "Approved" : "Rejected";
+            })
+            ->addIndexColumn()
+                ->rawColumns(['action', 'status_str', 'approved_str'])
+                ->make(true);
+        // }
     }
 
     public function createLeave() {
@@ -194,12 +215,6 @@ class ManageHolidaysController extends Controller
         $interval = DateInterval::createFromDateString('1 day');
         $period = new DatePeriod($begin, $interval, $end);
 
-        // dd($period);
-        // foreach($period as $k => $v) {
-        //     $post['date2'][$k] = $v->format("Y-m-d");
-        // }
-
-        // return $post;
         DB::beginTransaction();
         // try {
             $post['employee_id'] = Crypt::decryptString($post['employee']);
@@ -221,7 +236,7 @@ class ManageHolidaysController extends Controller
             ];
             $save->employee->user->notify(new AssignLeave($notification));
             DB::commit();
-            return "success";
+            return redirect("/leave")->with("success", "Leave has been assigned");
         // } catch (\Throwable $th) {
         //     DB::rollback();
         //     return "fail";
@@ -230,9 +245,9 @@ class ManageHolidaysController extends Controller
     }
 
     public function editLeave($id) {
-        $data = Holiday::where("id", $id)->with("employee")->first();
-
-        return view("leave.edit", compact("data"));
+        $data = Holiday::where("id", $id)->with(["employee", 'leave_date_all'])->first();
+        $employee = Employee::where("company_id", session("company_id"))->get();
+        return view("leave.edit", compact("data", "employee"));
     }
 
     public function updateLeave(Request $request, $id){
@@ -274,13 +289,15 @@ class ManageHolidaysController extends Controller
 
     public function approve($id) {
         $data = Holiday::where("id", $id)->update(["is_approved" => 1]);
-
+        //TODO Ketika Approve ada input charge
         $notification = [
             'message' => "Your Leave has been approved",
             'url' => 'dashboard/pre-assesment',
             'action_status' => 'Pra Penilaian'
         ];
         $data->employee->user->notify(new ApproveLeave($notification));
+
+        return redirect("/leave")->with("success", "Leave has been approved");
     }
 
     public function reject($id) {
@@ -292,12 +309,19 @@ class ManageHolidaysController extends Controller
             'action_status' => 'Pra Penilaian'
         ];
         $save->employee->user->notify(new RejectLeave($notification));
+
+        return redirect("/leave")->with("success", "Leave has been Rejected");
     }
 
     public function listMyLeave() {
         $data = Holiday::where("user_id", Auth::id())->get();
 
         //datatable in here
+    }
+
+
+    public function deleteLeave($id) {
+        return Holiday::where("id", $id)->delete();
     }
 
     public function countHolidaysYear($jumlah = null) { //Menghitung Cuti Bersama dalam satu tahun
@@ -461,3 +485,4 @@ class ManageHolidaysController extends Controller
 //TODO Pengajuan Izin Keluar
 //TODO List Gaji Karyawan perbulan, Jika tidak ada pelanggaran mengambil Gaji pada tabel karyawan, jika ada pelanggaran maka ambil data pada tabel gaji yang sudah dikurangi
 //TODO Potongan Perbulan
+//TODO Notifikasi ke Admin ketika ada pengajuan Cuti

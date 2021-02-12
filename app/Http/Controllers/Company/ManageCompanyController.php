@@ -29,7 +29,7 @@ class ManageCompanyController extends Controller
 
             return Datatables::of($data)
                 ->addColumn('action', function ($data) {
-                    return "<a href='".route('company.edit', [$data['id']])."'><i class='fa fa-envelope text-info btn-email'></i></a>
+                    return "<a href='".route('company.edit', [$data['id']])."'><i class='fa fa-edit text-info'></i></a>
                     | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
             })->addColumn("user_name", function($row){
                return $row['user']['name'];

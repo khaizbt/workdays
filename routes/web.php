@@ -32,14 +32,20 @@ Route::prefix("employee")->middleware("auth")->group(function(){
     Route::get("edit/{id}", "Company\EmployeeController@edit")->name("employee.edit");
     Route::post("update/{id}", "Company\EmployeeController@update")->name("employee.update");
     Route::get("salary", "Holidays\ManageHolidaysController@countSalaryEmployeeAll");
+    Route::get("data", "Company\EmployeeController@data")->name("employee.data");
+    Route::delete("delete/{id}", "Company\EmployeeController@delete");
 });
 
 Route::prefix("leave")->middleware("auth")->group(function(){
-    Route::get("create", "Holidays\ManageHolidaysController@createLeave");
+    Route::get("create", "Holidays\ManageHolidaysController@createLeave")->name("leave.create");
     Route::post("store", "Holidays\ManageHolidaysController@storeLeave")->name("leave.store");
     Route::post("submit-leave", "Holidays\ManageHolidaysController@summitLeave")->name("submit.leave");
     Route::post("approve", "Holidays\ManageHolidaysController@approve")->name("approve.leave");
-    Route::get('/', 'Holidays\ManageHolidaysController@indexLeave');
+    Route::get('/', 'Holidays\ManageHolidaysController@indexLeave')->name("leave.index");
+    Route::get("data", "Holidays\ManageHolidaysController@dataLeave")->name("leave.data");
+    Route::get("edit/{id}", "Holidays\ManageHolidaysController@editLeave")->name("leave.edit");
+    Route::post("update/{id}", "Holidays\ManageHolidaysController@updateLeave")->name("leave.update");
+    Route::delete("delete/{id}", "Holidays\ManageHolidaysController@deleteLeave")->name("leave.delete");
     Route::get("count-cuti", "Holidays\ManageHolidaysController@countHolidaysYear");
     Route::get("count-cuti-employee", "Holidays\ManageHolidaysController@countHolidaysEmployee");
 });
