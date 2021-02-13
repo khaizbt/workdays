@@ -14,4 +14,8 @@ class SalaryCuts extends Model
         "value",
         "status"
     ];
+
+    public function employee() {
+        return $this->belongsTo("App\Models\Employee", "employee_id");
+    }
 }

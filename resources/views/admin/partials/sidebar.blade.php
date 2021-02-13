@@ -3,7 +3,7 @@
     <a href="{{ route('admin.dashboard') }}">{{ env('APP_NAME') }}</a>
   </div>
   <div class="sidebar-brand sidebar-brand-sm">
-    <a href="index.html">St</a>
+    <a href="index.html">WD</a>
   </div>
   <ul class="sidebar-menu">
       <li class="menu-header">Dashboard</li>

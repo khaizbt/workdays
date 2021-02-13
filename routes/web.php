@@ -52,16 +52,22 @@ Route::prefix("leave")->middleware("auth")->group(function(){
 
 Route::prefix("ovense")->middleware("auth")->group(function(){
     Route::get("/", "Company\OvenseController@index")->name("ovense.index");
+    Route::get("data", "Company\OvenseController@data")->name("ovense.data");
     Route::get("create", "Company\OvenseController@create")->name("ovense.create");
     Route::post("store", "Company\OvenseController@store")->name("ovense.store");
     Route::get("edit/{id}", "Company\OvenseController@edit")->name("ovense.edit");
     Route::post("update/{id}", "Company\OvenseController@update")->name("ovense.update");
+    Route::delete("delete/{id}", "Company\OvenseController@delete")->name("ovense.delete");
 });
 
 Route::prefix("salary-cut")->middleware("auth")->group(function(){
     Route::get("/", "Company\SalaryCutController@index")->name("salarycut.index");
+    Route::get("data", "Company\SalaryCutController@data")->name("salarycut.data");
     Route::get("create", "Company\SalaryCutController@create")->name("salarycut.create");
     Route::post("store", "Company\SalaryCutController@store")->name("salarycut.store");
+    Route::get("edit/{id}", "Company\SalaryCutController@edit")->name("salarycut.edit");
+    Route::post("update/{id}","Company\SalaryCutController@update")->name("salarycut.update");
+    Route::delete("delete/{id}", "Company\SalaryCutController@delete")->name("salarycut.delete");
 });
 
 Route::prefix("notification")->middleware("auth")->group(function(){

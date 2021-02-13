@@ -185,7 +185,7 @@ class ManageHolidaysController extends Controller
             })->with("employee")->get();
             return Datatables::of($data)
             ->addColumn('action', function ($data) {
-                return "<a href='".route('leave.edit', [$data['id']])."'><i class='fa fa-edit text-info'></i></a>
+                return "<a href='".route('leave.edit', [Crypt::encrypt($data['id'])])."'><i class='fa fa-edit text-info'></i></a>
                 | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
             })->addColumn('status_str', function($row){
                 return ($row['status'] == 1) ? "Cuti" : "Lainnya";
@@ -216,7 +216,7 @@ class ManageHolidaysController extends Controller
         $period = new DatePeriod($begin, $interval, $end);
 
         DB::beginTransaction();
-        // try {
+        try {
             $post['employee_id'] = Crypt::decryptString($post['employee']);
             $save = Holiday::create($post);
             // return $save;
@@ -237,30 +237,61 @@ class ManageHolidaysController extends Controller
             $save->employee->user->notify(new AssignLeave($notification));
             DB::commit();
             return redirect("/leave")->with("success", "Leave has been assigned");
-        // } catch (\Throwable $th) {
-        //     DB::rollback();
-        //     return "fail";
-        // }
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect("/leave")->with("error", "Assign Leave Failed #RT435");
+        }
 
     }
 
     public function editLeave($id) {
-        $data = Holiday::where("id", $id)->with(["employee", 'leave_date_all'])->first();
+        $data = Holiday::where("id", Crypt::decrypt($id))->with(["employee", 'leave_date_all'])->first();
         $employee = Employee::where("company_id", session("company_id"))->get();
         return view("leave.edit", compact("data", "employee"));
     }
 
     public function updateLeave(Request $request, $id){
         $post = $request->except("_token", 'employee_id');
-
+        // return $post;
         DB::beginTransaction();
         try {
-            $update = Holiday::update($post);
+            $begin = new DateTime($post['date_start']);
+            $end = new DateTime($post['date_end']);
+            $end = $end->modify( '+1 day' );
+
+            $interval = DateInterval::createFromDateString('1 day');
+            $period = new DatePeriod($begin, $interval, $end);
+            $post['employee_id'] = Crypt::decryptString($post['employee']);
+
+            // return $post;
+            $id = Crypt::decryptString($id);
+            $update = Holiday::where("id", $id)->update([
+                "leave_name" => $post['leave_name'],
+                "employee_id" => $post['employee_id'],
+                "status" => $post['status'],
+                "charge" => $post['charge'],
+                "date_start" => $post['date_start'],
+                "date_end" => $post['date_end'],
+                "is_approved" => $post['is_approved']
+            ]);
+
+            if($update){
+                LeaveDate::where("leave_id", $id)->delete();
+                foreach($period as $k => $v) {
+                    $save_date = LeaveDate::create([
+                        "leave_id" => $id,
+                        "date" =>  $v->format("Y-m-d"),
+                    ]);
+                }
+            }
+
+
             DB::commit();
-            return "success";
+
+            return redirect("/leave")->with("success", "Leave has been updated");
         } catch (\Throwable $th) {
             DB::rollback();
-            return "fail";
+            return redirect("/leave")->with("error", "Update Leave Failed #RT435");
         }
     }
 

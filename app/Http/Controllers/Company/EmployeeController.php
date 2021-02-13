@@ -66,10 +66,11 @@ class EmployeeController extends Controller
 
             }
             DB::commit();
-            return $company;
+            return redirect('/company')->with(['success' => 'Employee has been created']);
 
         } catch (\Throwable $th) {
             DB::rollback();
+            return redirect('/employee')->with(['error' => 'Create Employee Failed']);
         }
     }
 
@@ -77,7 +78,7 @@ class EmployeeController extends Controller
         $employee = Employee::where('id', $id)->first();
         $validate = MyHelper::validationEmployee($id, session("company_id"));
         if($validate == false) {
-            return redirect('/employee')->with(['error' => 'Data Company has been updated']);
+            return redirect('/employee')->with(['error' => 'Something went wrong, please try again']);
         }
         $user = User::where('id', $employee['user_id'])->first();
 
@@ -88,7 +89,7 @@ class EmployeeController extends Controller
         $post = $request->except("_token", 'user_id');
         $validate = MyHelper::validationEmployee($id, session("company_id"));
         if($validate == false) {
-            return redirect('/employee')->with(['error' => 'Data Company has been updated']);
+            return redirect('/employee')->with(['error' => 'Something went wrong, please try again']);
         }
 
         DB::beginTransaction();
@@ -112,9 +113,10 @@ class EmployeeController extends Controller
             }
 
             DB::commit();
-            return "success";
+            return redirect('/company')->with(['success' => 'Employee has been updated']);
         } catch (\Throwable $th) {
-            //throw $th;
+            DB::rollback();
+            return redirect('/company')->with(['error' => 'Update Employee Failed']);
         }
     }
 
@@ -127,7 +129,8 @@ class EmployeeController extends Controller
             DB::commit();
             return 1;
         } catch (\Throwable $th) {
-            //throw $th;
+            DB::rollback();
+            return 0;
         }
     }
 }

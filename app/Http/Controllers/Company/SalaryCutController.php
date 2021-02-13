@@ -8,10 +8,40 @@ use Illuminate\Http\Request;
 use App\Helpers\MyHelper;
 use App\Models\SalaryCuts;
 use App\Models\Employee;
+use DataTables;
 use DB;
 
 class SalaryCutController extends Controller
 {
+    public function index() {
+        $is_data_empty = SalaryCuts::whereHas("employee", function($q){
+            $q->where("company_id", session("company_id"));
+        })->get()->count() == 0 ? true : false;
+
+        return view('salarycut.index', ['is_data_empty' => $is_data_empty]);
+    }
+
+    public function data(Request $request) {
+        // if($request->ajax()) {
+            $data = SalaryCuts::whereHas("employee", function($q){
+                $q->where("company_id", session("company_id"));
+            })->with("employee")->orderBy("created_at", "desc")->get();
+
+
+            return Datatables::of($data)
+                ->addColumn('action', function ($data) {
+                    return "<a href='".route('salarycut.edit', [Crypt::encrypt($data['id'])])."'><i class='fa fa-edit text-info'></i></a>
+                    | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+            })
+            ->addColumn("status_value", function($q){
+                return ($q->status == 0) ? 'Dipotong 1x' : "Dipotong Perbulan";
+            })
+            ->addIndexColumn()
+                ->rawColumns(['action', 'status_value'])
+                ->make(true);
+        // }
+    }
+
     public function create() {
         $employee = Employee::where("company_id", session("company_id"))->get();
 
@@ -27,7 +57,7 @@ class SalaryCutController extends Controller
         try {
             $post['employee_id'] = Crypt::decryptString($post['employee_id']);
 
-        if($post['image']) {
+        if(isset($post['image']) && $post['image'] != null) {
             $upload = MyHelper::uploadFile($post['image'], "company/salary-cut/");
 
             if($upload['status'] == "fail")
@@ -47,9 +77,57 @@ class SalaryCutController extends Controller
         }
 
         DB::commit();
-        return "sukses";
+        return redirect('/salary-cut')->with(['success' => 'Salary Cut has been created']);
         } catch (\Throwable $th) {
-            return "error";
+            DB::rollback();
+            return redirect('/salary-cut')->with(['error' => 'Create Salary Cut Failed']);
         }
+    }
+
+    public function edit($id) {
+        $data = SalaryCuts::where("id", Crypt::decrypt($id))->with("employee")->first();
+
+        // return $data;
+        $employee = Employee::where("company_id", session("company_id"))->get();
+        return view("salarycut.edit", compact("data", "employee"));
+    }
+
+    public function update(Request $request, $id) {
+        $post = $request->except("id","_token");
+
+        DB::beginTransaction();
+        try {
+            $data = SalaryCuts::where("id", Crypt::decrypt($id))->first();
+
+        $update = $data->update([
+            "cuts_name" => $post['cuts_name'],
+            "notes" => $post['notes'],
+            "value" => $post['status'],
+            "status" => $post['status'],
+            "employee_id" => Crypt::decrypt($post['employee_id'])
+        ]);
+
+        if(isset($post['image']) && $post['image'] != null) {
+            $upload = MyHelper::uploadFile($post['image'], "company/salary-cut/");
+
+            if($upload['status'] == "fail")
+                return redirect()->back()->withInput();
+
+                $post['image'] = $upload['path'];
+            $data->update([
+                "image" => $post['image']
+            ]);
+        }
+        DB::commit();
+        return redirect('/salary-cut')->with(['success' => 'Salary Cut has been updated']);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect('/salary-cut')->with(['error' => 'Update Salary Cut failed']);
+        }
+    }
+
+
+    public function delete($id) {
+        return SalaryCuts::where("id", $id)->delete();
     }
 }

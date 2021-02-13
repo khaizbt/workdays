@@ -9,14 +9,33 @@ use App\Models\Ovense;
 use App\Models\Employee;
 use App\Models\EmployeeSalary;
 use App\Notifications\OvensePublish;
+use DataTables;
 use DB;
 
 class OvenseController extends Controller
 {
     public function index() {
-        $data = Ovense::orderBy("created_at", "asc")->get();
+        $is_data_empty = Ovense::whereHas("employee", function($q){
+            $q->where("company_id", session("company_id"));
+        })->get()->count() == 0 ? true : false;
 
-        //Datatable in here
+        return view('ovense.index', ['is_data_empty' => $is_data_empty]);
+    }
+
+    public function data(Request $request){
+        if($request->ajax()) {
+            $data = Ovense::whereHas("employee", function($q){
+                $q->where("company_id", session("company_id"));
+            })->with("employee")->orderBy("created_at", "desc")->get();
+            return Datatables::of($data)
+                ->addColumn('action', function ($data) {
+                    return "<a href='".route('ovense.edit', [Crypt::encrypt($data['id'])])."'><i class='fa fa-edit text-info'></i></a>
+                    | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+            })
+            ->addIndexColumn()
+                ->rawColumns(['action'])
+                ->make(true);
+        }
     }
 
     public function create() {
@@ -39,26 +58,7 @@ class OvenseController extends Controller
             // return $post;
             $save = Ovense::create($post);
 
-            // if($save && $post['punishment'] >0) {
-            //     $employee = Employee::where("id", $post['employee_id'])->first();
-            //     $salary = EmployeeSalary::where("employee_id", $post['employee_id'])->where("month", date('m'))->where("year", date("Y"))->first();
 
-            //     if(!$salary) {
-            //         $salary_now = EmployeeSalary::create([
-            //             "employee_id" => $post['employee_id'],
-            //             "month" => date("m"),
-            //             "year" => date("Y"),
-            //             "salary" => $employee['salary'] - $post['punishment']
-            //         ]);
-            //     } else {
-            //         $salary_now = EmployeeSalary::createOrUpdate([
-            //             "employee_id" => $post['employee_id'],
-            //             "month" => date("m"),
-            //             "year" => date("Y")
-            //         ],
-            //         ["salary" => $employee['salary'] - $post['punishment']] );
-            //     }
-            // }
             $notification = [
                 'message' => $message,
                 'url' => 'dashboard/pre-assesment',
@@ -75,9 +75,10 @@ class OvenseController extends Controller
     }
 
     public function edit($id) {
-        $data = Ovense::where('id', Crypt::decryptString($id))->with("employee")->get();
-
-        return view("ovense.edit", compact("data"));
+        $data = Ovense::where('id', Crypt::decrypt($id))->with("employee")->first();
+        $employee = Employee::where("company_id", session("company_id"))->get();
+        // return
+        return view("ovense.edit", compact("data", "employee"));
     }
 
     public function update(Request $request, $id) {
@@ -104,6 +105,8 @@ class OvenseController extends Controller
     }
 
     public function delete($id){
-        return Ovense::where('id', Crypt::decryptString($id))->delete();
+        return Ovense::where('id', $id)->delete();
     }
 }
+
+//TODO membuat tabel Salary dan diisi ketika ada perubahan gaji karyawan
