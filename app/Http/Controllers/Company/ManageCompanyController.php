@@ -40,20 +40,28 @@ class ManageCompanyController extends Controller
                 ->make(true);
         }
     }
-
+//TODO Edit company by admin company
     public function create(){
+        $user_data = User::where('level', 2)->get()->toArray();
+        $id_user = array_column($user_data, 'id');
+
         $user = User::where('level', 2)->get();
+
+        // return $user;
         return view('admin.company.create')->with('user', $user);
     }
 
     public function store(Request $request){
         $request->validate([
             'name' => 'required|unique:companies',
-            // 'date_salary' =>required
+            'logo'  => 'required'
+            // 'id_user' => 'required|unique:table,column,except,id'
 
         ]);
         $post = $request->all();
         // return $post;
+        $post['id_user'] = Crypt::decrypt($post['id_user']);
+
 
         DB::beginTransaction();
         if($post['logo']) {
@@ -67,7 +75,10 @@ class ManageCompanyController extends Controller
 
         if(isset($post['work_holiday']) && $post['work_holiday'] == "on")
             $post['work_holiday'] = 1;
-
+        $check_user = Company::where("id_user", $post['id_user'])->first();
+        if($check_user){
+            return redirect('/company')->with(['error' => 'User has been asigned to other company']);
+        }
         $company = Company::create($post);
 
         foreach($post['value'] as $k => $v) {
@@ -76,6 +87,8 @@ class ManageCompanyController extends Controller
                 'days' => $v
             ]);
         }
+
+        // $user = User::where("id")
         // $user = User::find($value['id_customer_analyst']);
         $notification = [
             'message' => "Company Has Been Craeted",
@@ -84,7 +97,7 @@ class ManageCompanyController extends Controller
         ];
         $company->user->notify(new SubmitLeave($notification));
         DB::commit();
-        return response()->json($company);
+        return redirect('/company')->with(['success' => 'Data Company has been created']);
     }
 
     public function edit($id){
@@ -134,4 +147,4 @@ class ManageCompanyController extends Controller
 
 
 //TODO Hitung Jumlah hari kerja di dashboard(Tidak dari klik kalender, list Holiday/Event bisa mencontoh company management)
-//TODO Download list gaji karyawan(sudah fixed, dan sudah dipotong karena pelanggaran)
+

@@ -9,7 +9,8 @@ use App\User;
 use App\Models\Company;
 use App\Helpers\MyHelper;
 use DataTables;
-
+use Excel;
+use App\Exports\UsersExport;
 use Auth;
 use Hash;
 use DB;
@@ -132,5 +133,9 @@ class EmployeeController extends Controller
             DB::rollback();
             return 0;
         }
+    }
+
+    public function exportExcel(){
+        return Excel::download(new UsersExport, 'invoices.xlsx');
     }
 }

@@ -77,14 +77,13 @@ class OvenseController extends Controller
     public function edit($id) {
         $data = Ovense::where('id', Crypt::decrypt($id))->with("employee")->first();
         $employee = Employee::where("company_id", session("company_id"))->get();
-        // return
+        // return $data;
         return view("ovense.edit", compact("data", "employee"));
     }
 
     public function update(Request $request, $id) {
         $post = $request->except('_token', 'id');
-        $post['id'] = Crypt::decryptString($id);
-
+        $post['id'] = Crypt::decrypt($id);
 
         DB::beginTransaction();
         try {
@@ -92,20 +91,28 @@ class OvenseController extends Controller
                 "ovense_name" => $post['ovense_name'],
                 "pinalty_type" => $post['pinalty_type'],
                 "date" => $post['date'],
-                "punishment" => $post['punishment']
+                "punishment" => $post['punishment'],
+                "employee_id" => Crypt::decrypt($post['employee_id']),
             ]);
 
             // $update->employee->user->notify(new OvensePublish($notification));
             DB::commit();
-            return true;
+            return "sukses";
         } catch (\Throwable $th) {
             DB::rollback();
-            return false;
+            return "fail";
         }
     }
 
     public function delete($id){
         return Ovense::where('id', $id)->delete();
+    }
+
+    public function myOvense() {
+        $data = Employee::where("user_id", \Auth::id())->with("ovense")->first();
+        $is_data_empty = $data->ovense->count() == 0 ? true : false;
+
+        return view("ovense.my", compact('data', 'is_data_empty'));
     }
 }
 

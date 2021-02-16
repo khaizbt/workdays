@@ -34,4 +34,8 @@ class Employee extends Model
     public function holiday_paid() {
         return $this->hasMany('App\Models\Holiday', 'employee_id')->whereNotNull("charge");
     }
+
+    public function salary_cut(){
+        return $this->hasMany('App\Models\SalaryCuts', "employee_id")->where("status", 0);
+    }
 }

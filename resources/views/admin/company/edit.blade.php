@@ -31,7 +31,7 @@ Dashboard
                             <div class="form-group">
                                 <label for="admin">Admin</label>
 
-                                <select name="id_user" id="select2" class="form-control">
+                                <select name="id_user" id="select2" class="form-control" disabled>
                                     <option value="">Choose Admin</option>
                                     @foreach($user as $key => $value)
                                     <option value="{{ Crypt::encrypt($value['id']) }}" {{($value['id'] == $data['id_user']) ? 'selected' : ''}}>{{$value['name']}}</option>

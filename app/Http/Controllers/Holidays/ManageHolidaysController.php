@@ -9,6 +9,7 @@ use Auth;
 use DB;
 use DateInterval;
 use DataTables;
+use PDF;
 use App\Models\Employee;
 use App\Models\Holiday;
 use App\Models\Company;
@@ -115,7 +116,7 @@ class ManageHolidaysController extends Controller
                 $date_holidays = strtotime($key1);
                 $is_holidays = date("N", $date_holidays);
 
-                    if(!in_array($is_holidays, $day)){ //TODO Konfigurasi Pengaturan Company untuk Libura dan lain-lain
+                    if(!in_array($is_holidays, $day)){
                         $no_days++;
                     }
                 }
@@ -125,31 +126,13 @@ class ManageHolidaysController extends Controller
 
         return $no_days;
     }
-    public function countWorking($startDate){
-        return $startDate;
-        $begin = strtotime($startDate);
-        $end_date =  strtotime(date('Ymd',strtotime('+1 month',$begin)));
-        $last_day = date('Ymd',strtotime('-1 days',$end_date));
-        $end   = strtotime($last_day);
-            $no_days  = 0;
-            while ($begin <= $end) {
-                $what_day = date("N", $begin);
-                if (!in_array($what_day, [6,7]) ) // 6 and 7 are weekend
-                    $no_days++;
-                $begin += 86400; // +1 day
-            }
-        $holidays = $this->countHolidays($startDate, $last_day);
 
-
-        return ($no_days-$holidays);
-    }
 
     public function index(Request $request){
         $events = [];
         $holidays = [];
 
         $data = $this->getApiHolidays();
-        //TODO Cuti dalam 1 tahun, dan Karyawan dapat mengajukan Cuti
 
         foreach($data as $key => $value){
                 $time = strtotime($value['date']) ?? strtotime('20190101');
@@ -162,7 +145,6 @@ class ManageHolidaysController extends Controller
                 ];
         }
 
-        //TODO Event, Absen dan lain2 ditaruh sini
 
         return view('calendar.calendar', compact('events'));
     }
@@ -173,7 +155,7 @@ class ManageHolidaysController extends Controller
             $q->where("company_id", session("company_id"));
         })->where('is_approved', 2)->with('employee')->get();
 
-        $is_data_empty = $holiday->count() == 0 ? true : false;
+        $is_data_empty = $holiday->count() == -100 ? true : false;
 
         return view('leave.index', ['is_data_empty' => $is_data_empty, "holiday" => $holiday]);
     }
@@ -295,32 +277,53 @@ class ManageHolidaysController extends Controller
         }
     }
 
-    public function summitLeave(Request $request) {
-        $post = $request->except("_token", "charge", "is_approved");
+    public function submitIndex() {
+        return view("leave.submit");
+    }
 
+    public function summitLeave(Request $request) {
+        $post = $request->except("_token", "charge", "is_approved", "employee_id");
+        $post = $request->except("_token");
+        $begin = new DateTime($post['date_start']);
+        $end = new DateTime($post['date_end']);
+        $end = $end->modify( '+1 day' );
+
+        $interval = DateInterval::createFromDateString('1 day');
+        $period = new DatePeriod($begin, $interval, $end);
         DB::beginTransaction();
         try {
-            $post['employee_id'] = Auth::id();
+            $post['employee_id'] = Employee::where("user_id", Auth::id())->first()->id;
+            $post['is_approved'] = 2;
             $save = Holiday::create($post);
+            if($save){
+                foreach($period as $k => $v) {
+                    $save_date = LeaveDate::create([
+                        "leave_id" => $save['id'],
+                        "date" =>  $v->format("Y-m-d"),
+                    ]);
+                }
+            }
 
+            $company  = Company::where("id", session("company_id"))->first();
             $notification = [
-                'message' => "Leave has been created",
-                'url' => 'dashboard/pre-assesment',
+                'message' => "Leave has been Submitted",
+                'url' => 'leave',
                 'action_status' => 'Pra Penilaian'
             ];
-            $save->employee->user->notify(new SubmitLeave($notification));
+            $company->user->notify(new SubmitLeave($notification));
             DB::commit();
 
-            return true;
+            return redirect("/leave/my-leave")->with("success", "Leave has been submitted");
         } catch (\Throwable $th) {
             DB::rollback();
-            return false;
+            return redirect("/leave/my-leave")->with("error", "Submit Leave Failed");
         }
     }
 
-    public function approve($id) {
-        $data = Holiday::where("id", $id)->update(["is_approved" => 1]);
-        //TODO Ketika Approve ada input charge
+    public function approve(Request $request,$id) {
+        $data = Holiday::where("id", $id)->first();
+
+        $data->update(["is_approved" => 1, "charge" => $request->charge ?? null]);
         $notification = [
             'message' => "Your Leave has been approved",
             'url' => 'dashboard/pre-assesment',
@@ -331,23 +334,48 @@ class ManageHolidaysController extends Controller
         return redirect("/leave")->with("success", "Leave has been approved");
     }
 
-    public function reject($id) {
-        $data = Holiday::where("id", $id)->update(['is_approved' => 0]);
+    public function reject(Request $request,$id) {
+        // return $request;
+        $data = $data = Holiday::where("id", $id)->first();
+
+        $data->update(['is_approved' => 0, "reject_reason" => $request->reject_reason]);
+
+        // return $data;
 
         $notification = [
-            'message' => "Your Leave has been rejected",
+            'message' => "Your Leave has been rejected! Because ".$request->reject_reason,
             'url' => 'dashboard/pre-assesment',
             'action_status' => 'Pra Penilaian'
         ];
-        $save->employee->user->notify(new RejectLeave($notification));
+        $data->employee->user->notify(new RejectLeave($notification));
 
-        return redirect("/leave")->with("success", "Leave has been Rejected");
+        // return redirect("/leave")->with("success", "Leave has been Rejected");
     }
 
     public function listMyLeave() {
-        $data = Holiday::where("user_id", Auth::id())->get();
+        $employee_id = Employee::where("user_id", Auth::id())->first()->id;
+        $data = Holiday::where("employee_id", $employee_id)->orderBy("date_start", "desc")->get();
 
-        //datatable in here
+        return Datatables::of($data)
+        ->addColumn("approved", function($q){
+            return ($q['is_approved'] == 1) ? "approved" : (($q['is_approved'] == 0) ? "rejected" : "pending");
+        })->addColumn("status_str", function($q){
+            return ($q['status'] == 1) ? "cuti" : (($q['status'] == 2) ? "sakit" : (($q['status'] == 3) ? "alpha" : "izin"));
+        }) ->addColumn('action', function ($data) {
+            return "<a href='".route('company.edit', [$data['id']])."'><i class='fa fa-edit text-info'></i></a>";
+        })
+        ->addIndexColumn()
+        ->rawColumns(["status_str", "action"])
+            ->make(true);
+    }
+
+    public function myLeave() {
+        $employee_id = Employee::where("user_id", Auth::id())->first()->id;
+        $data = Holiday::where("employee_id", $employee_id)->orderBy("date_start", "desc")->get()->count() == 0 ? true : false;
+
+        return view('leave.myleave', ['is_data_empty' => $data]);;
+
+
     }
 
 
@@ -420,6 +448,8 @@ class ManageHolidaysController extends Controller
             $query->whereHas("leave_date", function($que) use($begin, $last_day){
                 $que->whereBetween("date", [$begin, $last_day]);
             });
+        }])->with(['salary_cut' => function($q)  use($begin, $last_day){
+            $q->whereBetween("created_at", [$begin, $last_day]);
         }])->get();
 
         // return $employee;
@@ -427,6 +457,7 @@ class ManageHolidaysController extends Controller
         foreach($employee as $key => $value){
             $sum_ovense = 0;
             $sum_holiday_paid = 0;
+            $sum_salary_cut = 0;
 
             foreach($value['ovense'] as $key1 => $value1){
                 // return $value1['punishment'];
@@ -440,12 +471,25 @@ class ManageHolidaysController extends Controller
                 $employee[$key]['holiday_paid_total'] = $sum_holiday_paid;
             }
 
-            $employee[$key]['salary_fix'] = $value['salary'] - $sum_ovense - $sum_holiday_paid;
+            foreach($value['salary_cut'] as $key3 => $value3) {
+                $sum_salary_cut += $value3['value'];
+                $employee[$key]['salary_cut_total'] = $sum_salary_cut;
+            }
+
+            $employee[$key]['salary_fix'] = $value['salary'] - $sum_ovense - $sum_holiday_paid - $sum_salary_cut;
 
         // }
 
         }
         return $employee;
+
+        return Datatables::of($employee)
+            ->addColumn('action', function ($data) {
+                return "<a href='".route('salary.show', [Crypt::encrypt($data['id'])])."'><i class='fa fa-eye text-info'></i></a>";
+            })
+            ->addIndexColumn()
+                ->rawColumns(['action'])
+                ->make(true);
 
     }
 
@@ -480,6 +524,8 @@ class ManageHolidaysController extends Controller
             $query->whereHas("leave_date", function($que) use($begin, $last_day){
                 $que->whereBetween("date", ["2021-01-01", $last_day]);
             });
+        }])->with(['salary_cut' => function($q)  use($begin, $last_day){
+            $q->whereBetween("created_at", [$begin, $last_day]);
         }])->first();
 
         // foreach($employee as $key => $value){
@@ -492,6 +538,8 @@ class ManageHolidaysController extends Controller
                 $employee['punishment_total'] = $sum_ovense;
                 // $employee['salary_fix'] = $value['salary'] - $sum_ovense;
             }
+
+
 
             foreach($employee['holiday_paid'] as $key2 => $value2) {
                 $sum_holiday_paid += $value2['charge'];
@@ -507,13 +555,138 @@ class ManageHolidaysController extends Controller
 
     }
 
+    public function detailSalary($month, $employee) {
+        $company = Company::where("id", session("company_id"))->first();
+
+
+        for($i = 1; $i <= 12; $i++){
+            if($month == $i) {
+                $date = date('Y-'.$i.'-'.$company['date_salary']);
+                $begin = date('Y-m-d',strtotime('-1 days',strtotime($date)));
+                break;
+            } elseif($month == null) {
+                $begin = date('Y-m-'.$company['date_salary']);
+            }
+        }
+
+        if($company['date_salary'] > date('d') && $month == null){
+            $begin_date = date('Y-m-'.$company['date_salary']);
+            $date_str =  strtotime(date('Ymd',strtotime('-1 month',strtotime($begin))));
+            $begin = date('Y-m-d',strtotime('-1 days',$date_str));
+        }
+            // return $begin;
+        $end_date =  strtotime(date('Ymd',strtotime('+1 month',strtotime($begin))));
+        $last_day = date('Y-m-d',strtotime('-1 days',$end_date));
+        $end   = strtotime($last_day);
+
+
+        $employee = Employee::where('user_id', $employee)->with(['ovense' => function($q) use($begin, $last_day){
+            $q->whereBetween("date", ["2021-02-01", $last_day]);
+        }])->with(['holiday_paid' => function($query) use($begin, $last_day){
+            $query->whereHas("leave_date", function($que) use($begin, $last_day){
+                $que->whereBetween("date", ["2021-01-01", $last_day]);
+            });
+        }])->with(['salary_cut' => function($q)  use($begin, $last_day){
+            $q->whereBetween("created_at", [$begin, $last_day]);
+        }])->first();
+
+        // foreach($employee as $key => $value){
+            $sum_ovense = 0;
+            $sum_holiday_paid = 0;
+            $sum_salary_cut = 0;
+
+            foreach($employee['ovense'] as $key1 => $value1){
+                // return $value1['punishment'];
+                $sum_ovense += $value1['punishment'];
+                $employee['punishment_total'] = $sum_ovense;
+                // $employee['salary_fix'] = $value['salary'] - $sum_ovense;
+            }
+
+            foreach($employee['holiday_paid'] as $key2 => $value2) {
+                $sum_holiday_paid += $value2['charge'];
+                $employee['holiday_paid_total'] = $sum_holiday_paid;
+            }
+
+            foreach($employee['salary_cut'] as $key3 => $value3) {
+                $sum_salary_cut += $value3['value'];
+                $employee['salary_cut_total'] = $sum_salary_cut;
+            }
+
+            $employee['salary_fix'] = $employee['salary'] - $sum_ovense - $sum_holiday_paid - $sum_salary_cut;
+
+        // }
+            // return $employee;
+        // }
+            return view("employee.detail", compact("employee"));
+    }
+
+
+    public function exportPdf($employee, $month = null) {
+        $company = Company::where("id", session("company_id"))->first();
+
+
+        for($i = 1; $i <= 12; $i++){
+            if($month == $i) {
+                $date = date('Y-'.$i.'-'.$company['date_salary']);
+                $begin = date('Y-m-d',strtotime('-1 days',strtotime($date)));
+                break;
+            } elseif($month == null) {
+                $begin = date('Y-m-'.$company['date_salary']);
+            }
+        }
+
+        if($company['date_salary'] > date('d') && $month == null){
+            $begin_date = date('Y-m-'.$company['date_salary']);
+            $date_str =  strtotime(date('Ymd',strtotime('-1 month',strtotime($begin))));
+            $begin = date('Y-m-d',strtotime('-1 days',$date_str));
+        }
+            // return $begin;
+        $end_date =  strtotime(date('Ymd',strtotime('+1 month',strtotime($begin))));
+        $last_day = date('Y-m-d',strtotime('-1 days',$end_date));
+        $end   = strtotime($last_day);
+
+
+        $employee = Employee::where('user_id', $employee)->with(['ovense' => function($q) use($begin, $last_day){
+            $q->whereBetween("date", ["2021-02-01", $last_day]);
+        }])->with(['holiday_paid' => function($query) use($begin, $last_day){
+            $query->whereHas("leave_date", function($que) use($begin, $last_day){
+                $que->whereBetween("date", ["2021-01-01", $last_day]);
+            });
+        }])->with(['salary_cut' => function($q)  use($begin, $last_day){
+            $q->whereBetween("created_at", [$begin, $last_day]);
+        }])->with('company')->first();
+
+        // foreach($employee as $key => $value){
+            $sum_ovense = 0;
+            $sum_holiday_paid = 0;
+            $sum_salary_cut = 0;
+
+            foreach($employee['ovense'] as $key1 => $value1){
+                // return $value1['punishment'];
+                $sum_ovense += $value1['punishment'];
+                $employee['punishment_total'] = $sum_ovense;
+                // $employee['salary_fix'] = $value['salary'] - $sum_ovense;
+            }
+
+            foreach($employee['holiday_paid'] as $key2 => $value2) {
+                $sum_holiday_paid += $value2['charge'];
+                $employee['holiday_paid_total'] = $sum_holiday_paid;
+            }
+
+            foreach($employee['salary_cut'] as $key3 => $value3) {
+                $sum_salary_cut += $value3['value'];
+                $employee['salary_cut_total'] = $sum_salary_cut;
+            }
+
+            $employee['salary_fix'] = $employee['salary'] - $sum_ovense - $sum_holiday_paid - $sum_salary_cut;
+
+            // return $employee;
+        // }
+            // return view("employee.slipgaji", compact('employee'));
+        // }
+        $pdf = PDF::loadview('employee.slipgaji',['employee'=>$employee]);
+	    return $pdf->stream('Slip Gaji-'.$employee['name'].'.pdf');
+    }
+
     // public function
 }
-//TODO Notifikasi Karyawan Mengajukan Cuti, Terkena Denda, ataupun ada Event,
-//TODO Karyawan dapat Slip Gaji.
-//TODO Pelanggaran
-//TODO Event
-//TODO Pengajuan Izin Keluar
-//TODO List Gaji Karyawan perbulan, Jika tidak ada pelanggaran mengambil Gaji pada tabel karyawan, jika ada pelanggaran maka ambil data pada tabel gaji yang sudah dikurangi
-//TODO Potongan Perbulan
-//TODO Notifikasi ke Admin ketika ada pengajuan Cuti

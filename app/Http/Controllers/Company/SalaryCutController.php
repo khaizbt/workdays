@@ -9,6 +9,7 @@ use App\Helpers\MyHelper;
 use App\Models\SalaryCuts;
 use App\Models\Employee;
 use DataTables;
+use Auth;
 use DB;
 
 class SalaryCutController extends Controller
@@ -99,10 +100,25 @@ class SalaryCutController extends Controller
         try {
             $data = SalaryCuts::where("id", Crypt::decrypt($id))->first();
 
+            if($data['status'] == 1 && $post['value'] != $data['value']){
+                $employee = Employee::where("id", Crypt::decrypt($post['employee_id']))->first();
+                if($post['value'] > $data['value']){
+                    $post['value'] = $post['value'] - $data['value'];
+                    $employee = $employee->update([
+                        "salary" => $employee['salary'] - $post['value'] //Ketika Update tinggal sesuaikan, Jumlah sekarang lbh besar maka dikurangi, jika lbh kecil maka ditambah sisa
+                    ]);
+                } elseif($post['value'] < $data['value']) {
+                    $post['value'] = $data['value'] - $post['value'];
+                    $employee = $employee->update([
+                        "salary" => $employee['salary'] + $post['value'] //Ketika Update tinggal sesuaikan, Jumlah sekarang lbh besar maka dikurangi, jika lbh kecil maka ditambah sisa
+                    ]);
+                }
+            }
+
         $update = $data->update([
             "cuts_name" => $post['cuts_name'],
             "notes" => $post['notes'],
-            "value" => $post['status'],
+            "value" => $post['value'],
             "status" => $post['status'],
             "employee_id" => Crypt::decrypt($post['employee_id'])
         ]);
@@ -128,6 +144,22 @@ class SalaryCutController extends Controller
 
 
     public function delete($id) {
-        return SalaryCuts::where("id", $id)->delete();
+        $data = SalaryCuts::where("id", $id)->first();
+
+        if($data['status'] == 1){
+            $employee = Employee::where("id", $data['employee_id'])->first();
+            $employee->update([
+                "salary" => $employee['salary'] + $data['value'],
+            ]);
+        }
+        return $data->delete();
+    }
+
+    public function mySalaryCut() {
+        $data = Employee::where("user_id", Auth::id())->with("salary_cut")->first();
+        $is_data_empty = $data->salary_cut->count() == 0 ? true : false;
+
+
+        return view("salarycut.mysalarycut", compact('data', 'is_data_empty'));
     }
 }

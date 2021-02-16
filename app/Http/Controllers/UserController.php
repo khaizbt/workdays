@@ -54,7 +54,11 @@ class UserController extends Controller
      */
     public function store(UserAddRequest $request)
     {
-        $user = User::create($request->all());
+        // $request->level = 2;
+        $post = $request->all();
+        $post['level'] = 2;
+        $post['password'] = \Hash::make($post['password']);
+        $user = User::create($post);
         $role = Role::find($request->role);
         if($role)
         {

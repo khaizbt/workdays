@@ -55,6 +55,6 @@ class User extends Authenticatable
     }
 
     public function adminCompany(){
-        return $this->hasMany('App\Models\Company', 'id_user');
+        return $this->hasOne('App\Models\Company', 'id_user');
     }
 }
