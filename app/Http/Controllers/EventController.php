@@ -56,7 +56,7 @@ class EventController extends Controller
                 $value->user->notify(new EventSubmit($notification));
             }
 
-
+//TODO Icon, Cek Typo Header dan Cek Redirect if Success or Error
 
             DB::commit();
             return redirect('/event')->with(['success' => 'Events has been created']);

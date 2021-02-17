@@ -273,7 +273,7 @@ class ManageHolidaysController extends Controller
         $company = Company::where('id_user', Auth::id())->first();
 
         if($numberDays > $company['maximum_leave']){
-            return redirect("/leave")->with("success", "maximum leave is ".$company['maxiimum_leave']);
+            return redirect("/leave")->with("error", "maximum leave is ".$company['maximum_leave'])." days";
         }
 
         DB::beginTransaction();
@@ -292,7 +292,7 @@ class ManageHolidaysController extends Controller
 
             $notification = [
                 'message' => "Your Leave has been assigned",
-                'url' => 'dashboard/pre-assesment',
+                'url' => 'leave/my-leave',
                 'action_status' => 'Pra Penilaian'
             ];
             $save->employee->user->notify(new AssignLeave($notification));
@@ -324,6 +324,21 @@ class ManageHolidaysController extends Controller
             $period = new DatePeriod($begin, $interval, $end);
             $post['employee_id'] = Crypt::decryptString($post['employee']);
 
+            $startTimeStamp = strtotime($post['date_start']);
+            $endTimeStamp = strtotime($post['date_end']);
+
+            $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+            $numberDays = $timeDiff/86400;  // 86400 seconds in one day
+
+            // and you might want to convert to integer
+            $numberDays = intval($numberDays+1);
+
+            $company = Company::where('id_user', Auth::id())->first();
+
+            if($numberDays > $company['maximum_leave']){
+                return redirect("/leave")->with("error", "maximum leave is ".$company['maximum_leave'])." days";
+            }
             // return $post;
             $id = Crypt::decryptString($id);
             $update = Holiday::where("id", $id)->update([
@@ -369,6 +384,22 @@ class ManageHolidaysController extends Controller
 
         $interval = DateInterval::createFromDateString('1 day');
         $period = new DatePeriod($begin, $interval, $end);
+
+        $startTimeStamp = strtotime($post['date_start']);
+        $endTimeStamp = strtotime($post['date_end']);
+
+        $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+        $numberDays = $timeDiff/86400;  // 86400 seconds in one day
+
+        // and you might want to convert to integer
+        $numberDays = intval($numberDays+1);
+
+        $company = Company::where('id_user', Auth::id())->first();
+
+        if($numberDays > $company['maximum_leave']){
+            return redirect("/leave")->with("success", "maximum leave is ".$company['maximum_leave'])." days";
+        }
         DB::beginTransaction();
         try {
             $post['employee_id'] = Employee::where("user_id", Auth::id())->first()->id;
@@ -405,7 +436,7 @@ class ManageHolidaysController extends Controller
         $data->update(["is_approved" => 1, "charge" => $request->charge ?? null]);
         $notification = [
             'message' => "Your Leave has been approved",
-            'url' => 'dashboard/pre-assesment',
+            'url' => 'leave/my-leave',
             'action_status' => 'Pra Penilaian'
         ];
         $data->employee->user->notify(new ApproveLeave($notification));
@@ -423,7 +454,7 @@ class ManageHolidaysController extends Controller
 
         $notification = [
             'message' => "Your Leave has been rejected! Because ".$request->reject_reason,
-            'url' => 'dashboard/pre-assesment',
+            'url' => 'leave/my-leave',
             'action_status' => 'Pra Penilaian'
         ];
         $data->employee->user->notify(new RejectLeave($notification));

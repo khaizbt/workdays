@@ -92,7 +92,7 @@ class ManageCompanyController extends Controller
         // $user = User::find($value['id_customer_analyst']);
         $notification = [
             'message' => "Company Has Been Craeted",
-            'url' => 'dashboard/pre-assesment',
+            'url' => 'company/edit-company',
             'action_status' => 'Pra Penilaian'
         ];
         $company->user->notify(new SubmitLeave($notification));

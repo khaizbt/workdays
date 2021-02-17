@@ -61,7 +61,7 @@ class OvenseController extends Controller
 
             $notification = [
                 'message' => $message,
-                'url' => 'dashboard/pre-assesment',
+                'url' => 'ovense/my-ovense',
                 'action_status' => 'Pra Penilaian'
             ];
             $save->employee->user->notify(new OvensePublish($notification));
