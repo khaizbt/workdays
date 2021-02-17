@@ -15,6 +15,7 @@ use App\Models\Holiday;
 use App\Models\Company;
 use App\Models\LeaveDate;
 use App\Models\WorkDay;
+use App\Models\Ovense;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Notifications\SubmitLeave;
@@ -30,22 +31,49 @@ class ManageHolidaysController extends Controller
 
         // $holiday = Holiday::where('status', '!=', [3])->where('is_approved', 1)->with('employee')->get();
 
-        $holiday = LeaveDate::whereHas('leave', function($q) {
-            $q->where("status", '!=', 3)->where("is_approved", 1);
-        })->with('leave.employee')->get();
+        if(Auth::user()->hasRole('Admin')){
+            $holiday = LeaveDate::whereHas('leave', function($q) {
+                $q->where("status", '!=', 3)->where("is_approved", 1)->whereHas('employee', function($que){
+                    $que->where('company_id', session('company_id'));
+                });
+            })->with('leave.employee')->get();
+        } elseif(Auth::user()->hasRole('User')){
+            $holiday = LeaveDate::whereHas('leave', function($q) {
+                $q->where("status", '!=', 3)->where("is_approved", 1)->whereHas('employee', function($que){
+                    $que->where('user_id', Auth::id());
+                });
+            })->with('leave.employee')->get();
+        }
+
+        if(Auth::user()->hasRole('Admin')){
+            $ovense = Ovense::whereHas('employee', function($q) {
+                $q->where('company_id', session('company_id'));
+            })->with('employee')->get();
+        } elseif(Auth::user()->hasRole('User')){
+            $ovense = Ovense::whereHas('employee', function($q) {
+                $q->where('user_id', Auth::id());
+            })->with('employee')->get();
+        }
+
+
+
+
+        $offense = [];
+        $events = [];
+        $cuti = [];
+        $holidays = [];
 
         $event = Event::where("company_id", session("company_id"))->get();
-        $events = [];
+
 
         foreach($event as $k => $v) {
             $v['deskripsi'] = $v['event_name'];
             $v['color'] = "#fc0356";
             $v['date'] = $v['time'];
-
+            $v['url'] =  (Auth::user()->hasRole('Admin')) ? 'event' : 'event/my-event';
             $events[strtotime($v['created_at'])] = $v;
         }
 
-        $holidays = [];
         foreach($holiday as $key => $val) {
             $val['deskripsi'] = $val['leave']['employee']['name'];
             if($val['leave']['status'] == 1)
@@ -55,9 +83,22 @@ class ManageHolidaysController extends Controller
             elseif($val['leave']['status'] == 4)
                 $val['status'] = '#a84632';
             // unset($val['employee']);
+            $val['url'] =  (Auth::user()->hasRole('Admin')) ? 'leave' : 'leave/my-leave';;
             $holidays[$val['id']] = $val;
 
         }
+
+
+        foreach($ovense as $key_ovense => $val_ovense) {
+            $val_ovense['deskripsi'] = $val_ovense['employee']['name'];
+            // $offense[$row] =
+                $val_ovense['color'] = 'red';
+            // return $val_ovense;
+            $offense[date('YmdHi', strtotime($val_ovense['created_at']))] = $val_ovense;
+
+        }
+
+        // return $holidays;
 
         // return $holidays;
 
@@ -67,10 +108,10 @@ class ManageHolidaysController extends Controller
 
         $json = json_decode($str, true);
         // return $json;
-        $cuti = [];
+
         foreach($json as $row => $value) {
             if($row != "created-at"){
-                  $value['date'] = $row;
+                    $value['date'] = $row;
 
             $cuti[$row] = $value;
             }
@@ -81,7 +122,7 @@ class ManageHolidaysController extends Controller
 
         // return $cuti;
 
-        return $holidays + $cuti + $events;
+        return $holidays + $cuti + $events + $offense;
 
 
         return $json;
@@ -134,12 +175,14 @@ class ManageHolidaysController extends Controller
 
         $data = $this->getApiHolidays();
 
+        // return $data;
+
         foreach($data as $key => $value){
                 $time = strtotime($value['date']) ?? strtotime('20190101');
                 $events[] = [
                     'title' =>  $value['deskripsi'] ?? 'tahun baru',
                     'start' => date("Y-m-d", $time).' 19:00:00',
-                    'url' => 'https://www.google.com/search?q='.($value['deskripsi'] ?? 'https://www.google.com/search?q=tahun+baru'),
+                    'url' => $value['url'] ?? 'https://www.google.com/search?q='.($value['deskripsi'] ?? 'https://www.google.com/search?q=tahun+baru'),
                     "color" => $value['color'] ?? '',
 
                 ];
@@ -481,7 +524,7 @@ class ManageHolidaysController extends Controller
         // }
 
         }
-        return $employee;
+
 
         return Datatables::of($employee)
             ->addColumn('action', function ($data) {
@@ -517,7 +560,7 @@ class ManageHolidaysController extends Controller
         $last_day = date('Y-m-d',strtotime('-1 days',$end_date));
         $end   = strtotime($last_day);
 
-        return $last_day;
+        // return $last_day;
         $employee = Employee::where('user_id', Auth::id())->with(['ovense' => function($q) use($begin, $last_day){
             $q->whereBetween("date", ["2021-02-01", $last_day]);
         }])->with(['holiday_paid' => function($query) use($begin, $last_day){
@@ -555,10 +598,10 @@ class ManageHolidaysController extends Controller
 
     }
 
-    public function detailSalary($month, $employee) {
+    public function detailSalary($employee) {
         $company = Company::where("id", session("company_id"))->first();
 
-
+        $month = null;
         for($i = 1; $i <= 12; $i++){
             if($month == $i) {
                 $date = date('Y-'.$i.'-'.$company['date_salary']);

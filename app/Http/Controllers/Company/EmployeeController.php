@@ -52,6 +52,8 @@ class EmployeeController extends Controller
                 'password' => Hash::make($post['password']),
                 'level' => 3
             ]);
+
+            $user->assignRole("User");
             $company = Company::where("id_user",2)->first();
             if($save) {
                 $employee = Employee::create([

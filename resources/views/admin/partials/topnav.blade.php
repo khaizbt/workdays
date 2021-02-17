@@ -4,10 +4,10 @@
     <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i class="fas fa-search"></i></a></li>
   </ul>
   <div class="search-element">
-    <input class="form-control" value="{{ Request::get('query') }}" name="query" type="search" placeholder="Search" aria-label="Search" data-width="250">
+    {{-- <input class="form-control" value="{{ Request::get('query') }}" name="query" type="search" placeholder="Search" aria-label="Search" data-width="250">
     <button class="btn" type="submit"><i class="fas fa-search"></i></button>
-    <div class="search-backdrop"></div>
-    {{-- @include('admin.partials.searchhistory') --}}
+    <div class="search-backdrop"></div> --}}
+
   </div>
 </form>
 <ul class="navbar-nav navbar-right">
@@ -44,10 +44,16 @@
       <a href="{{ Auth::user()->profilelink }}" class="dropdown-item has-icon">
         <i class="far fa-user"></i> Profile Settings
       </a>
+      @role("Admin")
+      <a href="{{ route('edit.company') }}" class="dropdown-item has-icon">
+        <i class="far fa-bandcamp"></i> Company Settings
+      </a>
+      @endrole
       <div class="dropdown-divider"></div>
       <a href="{{ route('logout') }}" class="dropdown-item has-icon text-danger">
         <i class="fas fa-sign-out-alt"></i> Logout
       </a>
+
     </div>
   </li>
 </ul>

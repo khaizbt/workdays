@@ -27,12 +27,13 @@ class DashboardController extends Controller
         // }
         $user = User::where('id', Auth::id())->first();
 
+
         if($user['level'] == 2) {
             $company = Company::where('id_user', $user['id'])->first();
             if($company)
                 session(["company_id" => $company['id']]);
             else
-                session(["company_id" => 1]);
+                session(["company_id" => 0]);
 
         } elseif ($user['level'] == 3){
             $employee = Employee::where("user_id", Auth::id())->first();

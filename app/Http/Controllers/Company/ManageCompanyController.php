@@ -143,6 +143,39 @@ class ManageCompanyController extends Controller
         return Company::where("id", $id)->delete();
     }
 
+    public function editCompany(){
+        $data = Company::where('id', session("company_id"))->first();
+
+        return view('admin.company.editmy', compact('data'));
+    }
+
+    public function updateCompany(Request $request){
+        $post = $request->except('id', 'id_user', '_token');
+
+        $data = $update = Company::where('id', session('company_id'))->first();
+        $data->update([
+            "name" => $post['name'],
+            "address" => $post['address'],
+            "phone" => $post['phone'],
+            "email" => $post['email'],
+            "number_leave" => $post['number_leave'],
+            "maximum_leave" => $post['maximum_leave'],
+            "date_salary" => $post['date_salary']
+        ]);
+
+        if(isset($post['logo']) && $post['logo'] != null) {
+            $upload = MyHelper::uploadFile($post['logo'], "company/logo/");
+
+            if($upload['status'] == "fail")
+                return redirect()->back()->withInput();
+
+            $data->update([
+                'logo' => $upload['path']
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Your Company has been updated")->withInput();
+    }
 }
 
 

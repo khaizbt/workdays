@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\{UserUpdateRequest,UserAddRequest};
 use Spatie\Permission\Models\Role;
 use App;
+use Auth;
 
 class UserController extends Controller
 {
@@ -86,6 +87,13 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        if(Auth::user()->hasRole('Super'))
+            return view('admin.users.edit', compact('user'));
+
+
+        if($user['id'] != Auth::id() )
+            return redirect('/');
+
         return view('admin.users.edit', compact('user'));
     }
 
