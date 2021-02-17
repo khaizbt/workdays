@@ -40,7 +40,7 @@ class ManageCompanyController extends Controller
                 ->make(true);
         }
     }
-//TODO Edit company by admin company
+
     public function create(){
         $user_data = User::where('level', 2)->get()->toArray();
         $id_user = array_column($user_data, 'id');

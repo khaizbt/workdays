@@ -7,7 +7,9 @@ use App\User;
 use App\Models\Company;
 use App\Models\Employee;
 use App\Models\LeaveDate;
+use App\Models\Ovense;
 use App\Models\Event;
+use App\Models\Holiday;
 use DatePeriod;
 use App\Models\WorkDay;
 use DateInterval;
@@ -15,6 +17,7 @@ use Auth;
 use Storage;
 use Image;
 use DateTime;
+use App\Http\Controllers\Holidays\ManageHolidaysController as HH;
 
 
 class DashboardController extends Controller
@@ -26,22 +29,40 @@ class DashboardController extends Controller
         //     return $value['data']['message'];
         // }
         $user = User::where('id', Auth::id())->first();
-
-
+            // return
+        $data;
         if($user['level'] == 2) {
             $company = Company::where('id_user', $user['id'])->first();
-            if($company)
+
+
+            // return self::countWorking();
+            // return $company;
+            if($company){
                 session(["company_id" => $company['id']]);
+                $data['count_working'] = self::countWorking();
+                $data['count_employee'] = self::employeeCount();
+                $data['count_leave'] = self::countLeave();
+                $data['gajian'] = date('l, '.$company['date_salary'].' F Y');
+            }
             else
                 session(["company_id" => 0]);
 
         } elseif ($user['level'] == 3){
+            $company = Company::where('id_user', $user['id'])->first();
+
             $employee = Employee::where("user_id", Auth::id())->first();
 
             session(["company_id" => $employee['company_id']]);
-        }
+            $data['count_leave'] = self::countHolidaysEmployee();
+            $data['count_working'] = self::countWorking();
+            $data['ovense'] = self::ovense();
+            $data['gajian'] = date('l, '.$company['date_salary'].' F Y');
 
-        return view('admin.dashboard.index');
+
+
+        }
+        // return $data;
+        return view('admin.dashboard.index', compact('data'));
     }
 
     public function getFile($file){
@@ -51,38 +72,25 @@ class DashboardController extends Controller
         return Image::make($file)->response();
     }
 
-    public function countWorking($startDate){
-        $begin = strtotime($startDate);
-        $end_date =  strtotime(date('Ymd',strtotime('+1 month',$begin)));
-        $last_day = date('Ymd',strtotime('-1 days',$end_date));
-        $end   = strtotime($last_day);
-            $no_days  = 0;
-            while ($begin <= $end) {
-                $what_day = date("N", $begin);
-                if (!in_array($what_day, [6,7]) ) // 6 and 7 are weekend
-                    $no_days++;
-                $begin += 86400; // +1 day
-            }
-        $holidays = $this->countHolidays($startDate, $last_day);
-
-
-        return ($no_days-$holidays);
-    }
-
     public function countHolidays($begin_date, $end_date){
         $begin = new DateTime($begin_date);
         $end = new DateTime($end_date);
 
-        $json = $this->getApiHolidays();
+        $json = $this->cutiBersama();
 
         $daterange = new DatePeriod($begin, new DateInterval('P1D'), $end);
         $date = [];
         $date_begin = strtotime($begin->format('Ymd'));
 
-        // return $date_begin;
+        // $date_work = WorkDay::where('id_company', session('company_id'))->get()->toArray();
+
+        // $days = [1, 2,3,4,5,6];
+
+        // $day = array_splice($days,1, array_column($date_work, 'days'));
 
 
-        // dd($what_day);
+
+        // return $days;
         $what_day = [];
         $no_days  = 0;
         foreach($daterange as $key => $value){
@@ -104,65 +112,96 @@ class DashboardController extends Controller
         return $no_days;
     }
 
-    public function getApiHolidays(){
+    public function countWorking(){
+        $company = Company::where('id', session('company_id'))->first();
+        $startDate = date('Ym'.$company['date_salary']);
+        $begin = strtotime($startDate);
+        $end_date =  strtotime(date('Ymd',strtotime('+1 month',$begin)));
+        $last_day = date('Ymd',strtotime('-1 days',$end_date));
+        $end   = strtotime($last_day);
+            $no_days  = 0;
+            while ($begin <= $end) {
+                $what_day = date("N", $begin);
+                if (!in_array($what_day, [6,7]) ) // 6 and 7 are weekend
+                    $no_days++;
+                $begin += 86400; // +1 day
+            }
+        $holidays = $this->countHolidays($startDate, $last_day);
+
+
+        return ($no_days-$holidays);
+    }
+
+    public function cutiBersama() {
         $str = file_get_contents('https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json');
 
-        // $holiday = Holiday::where('status', '!=', [3])->where('is_approved', 1)->with('employee')->get();
+       // return $str;
+       $json = json_decode($str, true);
 
-        $holiday = LeaveDate::whereHas('leave', function($q) {
-            $q->where("status", '!=', 3)->where("is_approved", 1);
-        })->with('leave.employee')->get();
+       return $json;
+   }
 
-        $event = Event::where("company_id", session("company_id"))->get();
-        $events = [];
+   public function countHolidaysYear($jumlah = null) { //Menghitung Cuti Bersama dalam satu tahun
+        $data = $this->cutiBersama();
 
-        foreach($event as $k => $v) {
-            $v['deskripsi'] = $v['event_name'];
-            $v['color'] = "#fc0356";
-            $v['date'] = $v['time'];
-
-            $events[strtotime($v['created_at'])] = $v;
-        }
-
-        $holidays = [];
-        foreach($holiday as $key => $val) {
-            $val['deskripsi'] = $val['leave']['employee']['name'];
-            if($val['leave']['status'] == 1)
-                $val['color'] = 'green';
-            elseif($val['leave']['status'] == 2)
-                $val['color'] = 'purple';
-            elseif($val['leave']['status'] == 4)
-                $val['status'] = '#a84632';
-            // unset($val['employee']);
-            $holidays[$val['id']] = $val;
-
-        }
-
-        // return $holidays;
-
-
-        $holiday_count = count($holiday);
-
-
-        $json = json_decode($str, true);
-        // return $json;
         $cuti = [];
-        foreach($json as $row => $value) {
-            if($row != "created-at"){
-                  $value['date'] = $row;
-
-            $cuti[$row] = $value;
+        foreach($data as $key => $val) {
+            // return $val;
+            if(substr($key,0,4) == date("Y")) {
+                if(strpos($val['deskripsi'], "Cuti Bersama") !== false) {
+                    $cuti[$key] = $val;
+                }
             }
-                // unset($row);
-            // return $value;
-
         }
 
-        // return $cuti;
+        if($jumlah != null)
+            return $cuti;
 
-        return $holidays + $cuti + $events;
-
-
-        return $json;
+        return count($cuti);
     }
+
+    public function countHolidaysEmployee() {
+        $company = Company::where("id", session("company_id"))->first();
+
+        $number_leave = $company['number_leave']-$this->countHolidaysYear();
+
+        $employee = Employee::where('user_id', Auth::id())->first();
+
+        // return $number_leave_employee;
+        $leave = LeaveDate::whereYear("date", date('Y'))->whereHas('leave', function($q) use($employee){
+            $q->where('employee_id', $employee['id'])->where('is_approved', 1);
+        })->get()->count();
+        // $leave = Holiday::where("employee_id", $number_leave_employee['id'])->where("is_approved", 1)->with()
+        // ->whereYear("created_at", 2021)->get();
+
+        return $number_leave-$leave;
+
+    }
+
+    public function ovense(){
+        $ovense = Ovense::whereYear('date', date('Y'))->whereHas('employee', function($q){
+            $q->where('user_id', Auth::id());
+        })->get();
+
+        return $ovense->count();
+    }
+
+    public function employeeCount(){
+        $employee = Employee::whereHas('company', function($q){
+            $q->where('id_user', Auth::id());
+        })->get()->count();
+
+        return $employee;
+    }
+
+    public function countLeave() {
+        $leave = Holiday::whereMonth('date_start', date('m'))->where('is_approved', 1)->whereHas('employee', function($q){
+            $q->where('company_id', session('company_id'));
+        })->get()->count();
+
+        return $leave;
+    }
+
+
+
 }

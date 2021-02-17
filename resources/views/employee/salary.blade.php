@@ -39,20 +39,22 @@ Dashboard
                                 class="btn btn-primary">Assign Leave <i class="fas fa-plus"></i></a></div>
                     </div>
                     <div class="card-body p-4">
-                        @if ($is_data_empty)
+                        {{-- @if ($is_data_empty)
                             <div class="text-center p-3 text-muted">
                                 <h5>No Results</h5>
                                 <p>Looks like you have not added any companies yet!</p>
                             </div>
-                        @else
+                        @else --}}
                             <table id="table-1" style="width: 100%">
                                 <thead>
                                     <tr>
                                         <th style="width: 5%;">No</th>
                                         <th width="40%">Employee Name</th>
-                                        <th>Type</th>
-                                        <th>Status</th>
-                                        <th>Charge</th>
+                                        <th>Base Salary</th>
+                                        <th>Punishment</th>
+                                        <th>Holiday Paid</th>
+                                        <th>Salary Cut</th>
+                                        <th>Salary Fix</th>
                                         <th style="width: 10%;">Action</th>
                                     </tr>
                                 </thead>
@@ -60,7 +62,7 @@ Dashboard
 
                                 </tbody>
                             </table>
-                        @endif
+                        {{-- @endif --}}
                     </div>
                 </div>
                 <!---->
@@ -78,7 +80,7 @@ Dashboard
         stateSave: true,
         "bFilter": true,
         "lengthChange": false,
-        ajax: "{{ route('leave.data') }}",
+        ajax: "{{ route('salary.data') }}",
         columns: [{
                 data: 'DT_RowIndex',
                 name: 'DT_RowIndex',
@@ -86,20 +88,28 @@ Dashboard
                 orderable: false
             },
             {
-                data: 'employee.name',
-                name: 'employee.name'
+                data: 'name',
+                name: 'name'
             },
             {
-                data: 'status_str',
-                name: 'status_str'
+                data: 'salary',
+                name: 'salary'
             },
             {
-                data: 'approved_str',
-                name: 'approved_str'
+                data: 'punishment_total',
+                name: 'punishment_total'
             },
             {
-                data: 'charge',
-                name: 'charge'
+                data: 'holiday_paid_total',
+                name: 'holiday_paid_total'
+            },
+            {
+                data: 'salary_cut_total',
+                name: 'salary_cut_total'
+            },
+            {
+                data: 'salary_fix',
+                name: 'salary_fix'
             },
             {
                 data: 'action',

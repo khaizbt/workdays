@@ -34,7 +34,7 @@ Dashboard
                     <div class="card-header">
                         <h4>Detail Salary</h4>
                         <div class="card-header-action">
-                            <a href="#" class="btn btn-primary">
+                            <a href="{{ route('pdf.salary', Illuminate\Support\Facades\Crypt::encrypt($employee['user_id'])) }}" class="btn btn-primary" target="_blank">
                                 Download Slip Gaji
                             </a>
                         </div>

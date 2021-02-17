@@ -8,7 +8,7 @@ Route::get('home', function() {
 });
 
 Route::get("file/{file}", "DashboardController@getFile")->name('get.file')->middleware("auth");
-Route::get("salary", "Holidays\ManageHolidaysController@countSalaryEmployee")->middleware("auth");
+// Route::get("salary", "Holidays\ManageHolidaysController@countSalaryEmployee")->middleware("auth");
 Route::prefix('holidays')->group(function() {
     Route::get('/', 'Holidays\ManageHolidaysController@index')->name("holiday.index");
     Route::get('count-working/{startDate}', 'Holidays\ManageHolidaysController@countWorking')->name('holiday.count.working');
@@ -33,12 +33,13 @@ Route::prefix("employee")->middleware("auth")->group(function(){
     Route::post("store", "Company\EmployeeController@store")->name("employee.store")->middleware(['role:Admin']);
     Route::get("edit/{id}", "Company\EmployeeController@edit")->name("employee.edit")->middleware(['role:Admin']);
     Route::post("update/{id}", "Company\EmployeeController@update")->name("employee.update")->middleware(['role:Admin']);
-    Route::get("salary", "Holidays\ManageHolidaysController@countSalaryEmployeeAll")->name('salary.index')->middleware(['role:Admin']);
+    Route::get("salary/data", "Holidays\ManageHolidaysController@countSalaryEmployeeAll")->name('salary.data')->middleware(['role:Admin']);
+    Route::get('salary', "Company\EmployeeController@salary")->name('salary.index');
     Route::get("salary/{employee}" , "Holidays\ManageHolidaysController@detailSalary")->name("salary.show");
     Route::get("data", "Company\EmployeeController@data")->name("employee.data")->middleware(['role:Admin']);
     Route::delete("delete/{id}", "Company\EmployeeController@delete")->middleware(['role:Admin']);
-    Route::get("export-salary/{id}", "Holidays\ManageHolidaysController@exportPdf");
-    Route::post("export-excel-salary", "Company\EmployeeController@exportExcel"); //TODO Nama Excel
+    Route::get("export-salary/{id}", "Holidays\ManageHolidaysController@exportPdf")->name('pdf.salary');
+    Route::get("export-excel-salary", "Company\EmployeeController@exportExcel");
 });
 
 Route::prefix("leave")->middleware("auth")->group(function(){
@@ -52,7 +53,7 @@ Route::prefix("leave")->middleware("auth")->group(function(){
     Route::get("edit/{id}", "Holidays\ManageHolidaysController@editLeave")->name("leave.edit")->middleware(['role:Admin']);
     Route::post("update/{id}", "Holidays\ManageHolidaysController@updateLeave")->name("leave.update")->middleware(['role:Admin']);
     Route::delete("delete/{id}", "Holidays\ManageHolidaysController@deleteLeave")->name("leave.delete")->middleware(['role:Admin']);
-    Route::get("count-cuti", "Holidays\ManageHolidaysController@countHolidaysYear");
+    Route::get("count-cuti", "Holidays\ManageHolidaysController@countWorking");
     Route::get("count-cuti-employee", "Holidays\ManageHolidaysController@countHolidaysEmployee");
     Route::get("my-leave/data", "Holidays\ManageHolidaysController@listMyLeave")->name("myleave.data");
     Route::get("my-leave", "Holidays\ManageHolidaysController@myLeave");

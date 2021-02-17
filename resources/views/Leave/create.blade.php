@@ -52,11 +52,14 @@ Create Leave
                             </div>
                             <div class="form-group">
                                 <label for="">Date</label>
+                                <div class="input-group">
+
                                 <input type="date" name="date_start"  class="form-control">
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="la la-ellipsis-h"></i>To</span>
                                 </div>
                                 <input type="date" class="form-control" name="date_end">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="title">Status</label>

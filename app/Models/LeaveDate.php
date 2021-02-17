@@ -12,6 +12,6 @@ class LeaveDate extends Model
         ];
 
         public function leave() {
-            return $this->belongsTo("App\Models\Holiday");
+            return $this->belongsTo("App\Models\Holiday", 'leave_id');
         }
 }

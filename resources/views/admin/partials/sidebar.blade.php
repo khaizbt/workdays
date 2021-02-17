@@ -25,7 +25,7 @@
         <li class="{{ Request::route()->getName() == 'employee.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('employee.index') }}"><i class="far fa-calendar-alt"></i> <span>Manage Employee</span></a></li>
         <li class="{{ Request::route()->getName() == 'leave.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('leave.index') }}"><i class="far fa-calendar-alt"></i> <span>Manage Leave</span></a></li>
         <li class="{{ Request::route()->getName() == 'salary.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('salary.index') }}"><i class="far fa-calendar-alt"></i> <span>Manage Salary</span></a></li>
-        <li class="{{ Request::route()->getName() == 'company.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('company.index') }}"><i class="far fa-calendar-alt"></i> <span>Manage Company</span></a></li>
+        {{-- <li class="{{ Request::route()->getName() == 'company.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('company.index') }}"><i class="far fa-calendar-alt"></i> <span>Manage Company</span></a></li> --}}
         <li class="{{ Request::route()->getName() == 'ovense.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('ovense.index') }}"><i class="far fa-calendar-alt"></i> <span>Manage Offense</span></a></li>
         <li class="{{ Request::route()->getName() == 'salarycut.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('salarycut.index') }}"><i class="far fa-calendar-alt"></i> <span>Manage Salary Cut</span></a></li>
         <li class="{{ Request::route()->getName() == 'event.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('event.index') }}"><i class="far fa-calendar-alt"></i> <span>Manage Event</span></a></li>
@@ -33,5 +33,3 @@
         @endrole
         </ul>
 </aside>
-//TODO List Ovense, Salary Cut di Calendar
-// TODO Show Detail Company, Edit Company by Admin

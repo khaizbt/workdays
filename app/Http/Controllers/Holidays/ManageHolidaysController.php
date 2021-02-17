@@ -132,17 +132,17 @@ class ManageHolidaysController extends Controller
         $begin = new DateTime($begin_date);
         $end = new DateTime($end_date);
 
-        $json = $this->getApiHolidays();
+        $json = $this->cutiBersama();
 
         $daterange = new DatePeriod($begin, new DateInterval('P1D'), $end);
         $date = [];
         $date_begin = strtotime($begin->format('Ymd'));
 
-        $date_work = WorkDay::where('id_company', session('company_id'))->get()->toArray();
+        // $date_work = WorkDay::where('id_company', session('company_id'))->get()->toArray();
 
-        $days = [1, 2,3,4,5,6];
+        // $days = [1, 2,3,4,5,6];
 
-        $day = array_splice($days,1, array_column($date_work, 'days'));
+        // $day = array_splice($days,1, array_column($date_work, 'days'));
 
 
 
@@ -157,7 +157,7 @@ class ManageHolidaysController extends Controller
                 $date_holidays = strtotime($key1);
                 $is_holidays = date("N", $date_holidays);
 
-                    if(!in_array($is_holidays, $day)){
+                    if(!in_array($is_holidays, [6,7])){
                         $no_days++;
                     }
                 }
@@ -166,6 +166,26 @@ class ManageHolidaysController extends Controller
         }
 
         return $no_days;
+    }
+
+    public function countWorking(){
+        $company = Company::where('id', session('company_id'))->first();
+        $startDate = date('Ym'.$company['date_salary']);
+        $begin = strtotime($startDate);
+        $end_date =  strtotime(date('Ymd',strtotime('+1 month',$begin)));
+        $last_day = date('Ymd',strtotime('-1 days',$end_date));
+        $end   = strtotime($last_day);
+            $no_days  = 0;
+            while ($begin <= $end) {
+                $what_day = date("N", $begin);
+                if (!in_array($what_day, [6,7]) ) // 6 and 7 are weekend
+                    $no_days++;
+                $begin += 86400; // +1 day
+            }
+        $holidays = $this->countHolidays($startDate, $last_day);
+
+
+        return ($no_days-$holidays);
     }
 
 
@@ -239,6 +259,22 @@ class ManageHolidaysController extends Controller
 
         $interval = DateInterval::createFromDateString('1 day');
         $period = new DatePeriod($begin, $interval, $end);
+
+        $startTimeStamp = strtotime($post['date_start']);
+        $endTimeStamp = strtotime($post['date_end']);
+
+        $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+        $numberDays = $timeDiff/86400;  // 86400 seconds in one day
+
+        // and you might want to convert to integer
+        $numberDays = intval($numberDays+1);
+
+        $company = Company::where('id_user', Auth::id())->first();
+
+        if($numberDays > $company['maximum_leave']){
+            return redirect("/leave")->with("success", "maximum leave is ".$company['maxiimum_leave']);
+        }
 
         DB::beginTransaction();
         try {
@@ -426,37 +462,7 @@ class ManageHolidaysController extends Controller
         return Holiday::where("id", $id)->delete();
     }
 
-    public function countHolidaysYear($jumlah = null) { //Menghitung Cuti Bersama dalam satu tahun
-        $data = $this->getApiHolidays();
 
-        $cuti = [];
-        foreach($data as $key => $val) {
-            // return $val;
-            if(substr($key,0,4) == date("Y")) {
-                if(strpos($val['deskripsi'], "Cuti Bersama") !== false) {
-                    $cuti[$key] = $val;
-                }
-            }
-        }
-
-        if($jumlah != null)
-            return $cuti;
-
-        return count($cuti);
-    }
-
-    public function countHolidaysEmployee() {
-        $company = Company::where("id", session("company_id"))->first();
-
-        $number_leave = 14-$this->countHolidaysYear();
-
-        $number_leave_employee = Employee::where("user_id", Auth::id())->first();
-        // return $number_leave_employee;
-        $leave = Holiday::where("employee_id", $number_leave_employee['id'])->where("is_approved", 1)->whereYear("created_at", 2021)->get();
-
-        return $leave;
-
-    }
 
     public function countSalaryEmployeeAll($month = null) {
         $company = Company::where("id", session("company_id"))->first();
@@ -505,19 +511,22 @@ class ManageHolidaysController extends Controller
             foreach($value['ovense'] as $key1 => $value1){
                 // return $value1['punishment'];
                 $sum_ovense += $value1['punishment'];
-                $employee[$key]['punishment_total'] = $sum_ovense;
                 // $employee[$key]['salary_fix'] = $value['salary'] - $sum_ovense;
             }
+            $employee[$key]['punishment_total'] = $sum_ovense;
+
 
             foreach($value['holiday_paid'] as $key2 => $value2) {
                 $sum_holiday_paid += $value2['charge'];
-                $employee[$key]['holiday_paid_total'] = $sum_holiday_paid;
             }
+            $employee[$key]['holiday_paid_total'] = $sum_holiday_paid;
+
 
             foreach($value['salary_cut'] as $key3 => $value3) {
                 $sum_salary_cut += $value3['value'];
-                $employee[$key]['salary_cut_total'] = $sum_salary_cut;
             }
+            $employee[$key]['salary_cut_total'] = $sum_salary_cut;
+
 
             $employee[$key]['salary_fix'] = $value['salary'] - $sum_ovense - $sum_holiday_paid - $sum_salary_cut;
 
@@ -525,11 +534,13 @@ class ManageHolidaysController extends Controller
 
         }
 
-
         return Datatables::of($employee)
             ->addColumn('action', function ($data) {
-                return "<a href='".route('salary.show', [Crypt::encrypt($data['id'])])."'><i class='fa fa-eye text-info'></i></a>";
+                return "<a href='".route('salary.show', [Crypt::encrypt($data['user_id'])])."'><i class='fa fa-eye text-info'></i></a>";
             })
+            // ->addColumn('holiday_paid_str', function($data){
+            //     return
+            // })
             ->addIndexColumn()
                 ->rawColumns(['action'])
                 ->make(true);
@@ -599,6 +610,8 @@ class ManageHolidaysController extends Controller
     }
 
     public function detailSalary($employee) {
+        $employee = Crypt::decrypt($employee);
+
         $company = Company::where("id", session("company_id"))->first();
 
         $month = null;
@@ -665,6 +678,7 @@ class ManageHolidaysController extends Controller
 
 
     public function exportPdf($employee, $month = null) {
+        $employee = Crypt::decrypt($employee);
         $company = Company::where("id", session("company_id"))->first();
 
 
@@ -729,6 +743,15 @@ class ManageHolidaysController extends Controller
         // }
         $pdf = PDF::loadview('employee.slipgaji',['employee'=>$employee]);
 	    return $pdf->stream('Slip Gaji-'.$employee['name'].'.pdf');
+    }
+
+    public function cutiBersama() {
+         $str = file_get_contents('https://raw.githubusercontent.com/guangrei/Json-Indonesia-holidays/master/calendar.json');
+
+        // return $str;
+        $json = json_decode($str, true);
+
+        return $json;
     }
 
     // public function

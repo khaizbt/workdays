@@ -138,6 +138,11 @@ class EmployeeController extends Controller
     }
 
     public function exportExcel(){
-        return Excel::download(new UsersExport, 'invoices.xlsx');
+        $company = Company::where('id', session('company_id'))->first();
+        return Excel::download(new UsersExport,  'List gaji '.$company['name'].'.xlsx');
+    }
+
+    public function salary(){
+        return view('employee.salary');
     }
 }

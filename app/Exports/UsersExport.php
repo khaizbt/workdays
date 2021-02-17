@@ -25,7 +25,7 @@ class UsersExport implements FromView, ShouldAutoSize
 
 
         // if($company['date_salary'] > date('d')){
-        if($company['date_salary'] > date('d') && $month == null){
+        if($company['date_salary'] > date('d')){
             $begin_date = date('Y-m-'.$company['date_salary']);
             $date_str =  strtotime(date('Ymd',strtotime('-1 month',strtotime($begin))));
             $begin = date('Y-m-d',strtotime('-1 days',$date_str));
