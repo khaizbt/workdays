@@ -29,6 +29,10 @@ class DashboardController extends Controller
         //     return $value['data']['message'];
         // }
         $user = User::where('id', Auth::id())->first();
+        // dd($user);
+        if(!$user->hasRole("Admin") && !$user->hasRole("User"))
+            return view('admin.dashboard.index');
+
             // return
         $data;
         if($user['level'] == 2) {

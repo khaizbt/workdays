@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Dashboard
+My Salary Cut
 @endsection
 
 @section('style')
@@ -24,7 +24,7 @@ Dashboard
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Manage Employee</h1>
+        <h1>My Salary Cut</h1>
     </div>
     @include('notification')
     <div class="section-body">
@@ -32,12 +32,10 @@ Dashboard
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Employee
+                        <h4>Saalry Cut
                             <!---->
                         </h4>
-                        <div class="card-header-action"><a href="{{route('company.create')}}"
-                                class="btn btn-primary">Add <i class="fas fa-plus"></i></a></div>
-                    </div>
+
                     <div class="card-body p-4">
                         @if ($is_data_empty)
                             <div class="text-center p-3 text-muted">

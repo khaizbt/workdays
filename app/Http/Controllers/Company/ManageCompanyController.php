@@ -62,6 +62,10 @@ class ManageCompanyController extends Controller
         // return $post;
         $post['id_user'] = Crypt::decrypt($post['id_user']);
 
+        $user = User::where('id', $post['id_user'])->first();
+         $user->assignRole("Admin");
+
+
 
         DB::beginTransaction();
         if($post['logo']) {
@@ -81,12 +85,12 @@ class ManageCompanyController extends Controller
         }
         $company = Company::create($post);
 
-        foreach($post['value'] as $k => $v) {
-            $work_days = WorkDay::create([
-                'id_company' => $company['id'],
-                'days' => $v
-            ]);
-        }
+        // foreach($post['value'] as $k => $v) {
+        //     $work_days = WorkDay::create([
+        //         'id_company' => $company['id'],
+        //         'days' => $v
+        //     ]);
+        // }
 
         // $user = User::where("id")
         // $user = User::find($value['id_customer_analyst']);

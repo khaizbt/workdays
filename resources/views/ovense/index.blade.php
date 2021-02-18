@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Dashboard
+Offense
 @endsection
 
 @section('style')
@@ -24,7 +24,7 @@ Dashboard
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Manage Ovense</h1>
+        <h1>Manage Offense</h1>
     </div>
     @include('notification')
     <div class="section-body">
@@ -32,24 +32,24 @@ Dashboard
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Ovense
+                        <h4>Offense
                             <!---->
                         </h4>
                         <div class="card-header-action"><a href="{{route('ovense.create')}}"
-                                class="btn btn-primary">Assign Ovense <i class="fas fa-plus"></i></a></div>
+                                class="btn btn-primary">Assign Offense <i class="fas fa-plus"></i></a></div>
                     </div>
                     <div class="card-body p-4">
                         @if ($is_data_empty)
                             <div class="text-center p-3 text-muted">
                                 <h5>No Results</h5>
-                                <p>Looks like you have not added any companies yet!</p>
+                                <p>Looks like you have not added any offense yet!</p>
                             </div>
                         @else
                             <table id="table-1" style="width: 100%">
                                 <thead>
                                     <tr>
                                         <th style="width: 5%;">No</th>
-                                        <th width="25%">Ovense Name</th>
+                                        <th width="25%">Offense Name</th>
                                         <th width="25%">Employee Name</th>
                                         <th>Pinalty Type</th>
                                         <th>Punishment</th>

@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Create Leave
+Create Salary Cut
 @endsection
 @section('style')
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -9,9 +9,9 @@ Create Leave
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Create Leave</h1>
+        <h1>Create Salary Cut</h1>
         <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Leave</a></div>
+            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Salary Cut</a></div>
             <div class="breadcrumb-item">Create </div>
         </div>
     </div>
@@ -21,7 +21,7 @@ Create Leave
                 <div class="card">
                     <form action="{{route('salarycut.store')}}" enctype="multipart/form-data" method="POST">
                         @csrf
-                        <div class="card-header"><h4>Add a New Company</h4></div>
+                        <div class="card-header"><h4>Add a New Salary Cut</h4></div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Salary Cut Name</label>

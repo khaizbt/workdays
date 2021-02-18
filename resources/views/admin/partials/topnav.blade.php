@@ -46,7 +46,7 @@
       </a>
       @role("Admin")
       <a href="{{ route('edit.company') }}" class="dropdown-item has-icon">
-        <i class="far fa-bandcamp"></i> Company Settings
+        <i class="far fa-id-card"></i> Company Settings
       </a>
       @endrole
       <div class="dropdown-divider"></div>

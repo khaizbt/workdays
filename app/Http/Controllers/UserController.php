@@ -60,11 +60,11 @@ class UserController extends Controller
         $post['level'] = 2;
         $post['password'] = \Hash::make($post['password']);
         $user = User::create($post);
-        $role = Role::find($request->role);
-        if($role)
-        {
-            $user->assignRole($role);
-        }
+        // $role = Role::find($request->role);
+        // if($role)
+        // {
+        //     $user->assignRole($role);
+        // }
         return response()->json($user);
     }
 

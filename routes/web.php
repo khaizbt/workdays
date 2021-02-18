@@ -39,7 +39,7 @@ Route::prefix("employee")->middleware("auth")->group(function(){
     Route::get("data", "Company\EmployeeController@data")->name("employee.data")->middleware(['role:Admin']);
     Route::delete("delete/{id}", "Company\EmployeeController@delete")->middleware(['role:Admin']);
     Route::get("export-salary/{id}", "Holidays\ManageHolidaysController@exportPdf")->name('pdf.salary');
-    Route::get("export-excel-salary", "Company\EmployeeController@exportExcel");
+    Route::get("export-excel-salary", "Company\EmployeeController@exportExcel")->name("excel.salary");
 });
 
 Route::prefix("leave")->middleware("auth")->group(function(){

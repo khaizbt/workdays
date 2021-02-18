@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Create Ovense
+Edit Offense
 @endsection
 @section('style')
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -9,9 +9,9 @@ Create Ovense
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Create Leave</h1>
+        <h1>Edit Offense</h1>
         <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Ovense</a></div>
+            <div class="breadcrumb-item active"><a href="{{ route('ovense.index') }}">Offense</a></div>
             <div class="breadcrumb-item">Update </div>
         </div>
     </div>
@@ -21,10 +21,10 @@ Create Ovense
                 <div class="card">
                     <form action="{{route('ovense.update', Illuminate\Support\Facades\Crypt::encrypt($data['id']))}}" method="POST">
                         @csrf
-                        <div class="card-header"><h4>Add a New Company</h4></div>
+                        <div class="card-header"><h4>Update Offense</h4></div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="title">Ovense Name</label>
+                                <label for="title">Offense Name</label>
                                 <input type="text" class="form-control" value={{ $data['ovense_name'] }} name="ovense_name">
                             </div>
                             <div class="form-group">

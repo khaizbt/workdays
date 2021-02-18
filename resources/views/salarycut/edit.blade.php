@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Create Leave
+Edit Salary Cut
 @endsection
 @section('style')
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -9,7 +9,7 @@ Create Leave
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Create Leave</h1>
+        <h1>Edit Salary Cut</h1>
         <div class="section-header-breadcrumb">
             <div class="breadcrumb-item active"><a href="{{ route('salarycut.index') }}">Leave</a></div>
             <div class="breadcrumb-item">Create </div>

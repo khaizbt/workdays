@@ -36,7 +36,9 @@ Dashboard
                             <!---->
                         </h4>
                         <div class="card-header-action"><a href="{{route('leave.create')}}"
-                                class="btn btn-primary">Assign Leave <i class="fas fa-plus"></i></a></div>
+                                class="btn btn-primary">Assign Leave <i class="fas fa-plus"></i></a>
+
+                            <a href="{{ route('excel.salary') }}" class="btn btn-success">Export to Excel <i class="fa fa-file" aria-hidden="true"></i></a></div>
                     </div>
                     <div class="card-body p-4">
                         {{-- @if ($is_data_empty)

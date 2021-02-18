@@ -19,7 +19,7 @@ class CreateHolidaysTable extends Migration
             $table->unsignedBigInteger("employee_id");
             $table->tinyInteger("status")->default(1);
             $table->integer("charge")->nullable(); //Jika ada denda Cuti
-            $table->date("date_start");
+            $table->date("date_start")->nullable();
             $table->date("date_end")->nullable();
             $table->tinyInteger("is_approved")->default(0);
             $table->timestamps();

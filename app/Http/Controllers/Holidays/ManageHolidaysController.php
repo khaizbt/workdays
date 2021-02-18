@@ -54,13 +54,30 @@ class ManageHolidaysController extends Controller
                 $q->where('user_id', Auth::id());
             })->with('employee')->get();
         }
+        $cuti = [];
+
+        $json = json_decode($str, true);
+
+        foreach($json as $row => $value) {
+            if($row != "created-at"){
+                    $value['date'] = $row;
+
+            $cuti[$row] = $value;
+            }
+                // unset($row);
+            // return $value;
+
+        }
+
+        if(!Auth::user()->hasRole('Admin') && !Auth::user()->hasRole('User')){
+            return $cuti;
+        }
 
 
 
 
         $offense = [];
         $events = [];
-        $cuti = [];
         $holidays = [];
 
         $event = Event::where("company_id", session("company_id"))->get();
@@ -103,22 +120,21 @@ class ManageHolidaysController extends Controller
         // return $holidays;
 
 
-        $holiday_count = count($holiday);
+        // $holiday_count = count($holiday);
 
 
-        $json = json_decode($str, true);
-        // return $json;
+        // // return $json;
 
-        foreach($json as $row => $value) {
-            if($row != "created-at"){
-                    $value['date'] = $row;
+        // foreach($json as $row => $value) {
+        //     if($row != "created-at"){
+        //             $value['date'] = $row;
 
-            $cuti[$row] = $value;
-            }
-                // unset($row);
-            // return $value;
+        //     $cuti[$row] = $value;
+        //     }
+        //         // unset($row);
+        //     // return $value;
 
-        }
+        // }
 
         // return $cuti;
 
