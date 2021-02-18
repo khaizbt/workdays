@@ -3,7 +3,6 @@
 @section('title')
 Dashboard
 @endsection
-
 @section('style')
     <style>
         #table-1{
