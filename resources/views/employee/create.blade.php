@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Dashboard
+Create Emplotee
 @endsection
 
 @section('content')
@@ -19,7 +19,7 @@ Dashboard
                 <div class="card">
                     <form action="{{route('employee.store')}}" method="POST">
                         @csrf
-                        <div class="card-header"><h4>Add a New Company</h4></div>
+                        <div class="card-header"><h4>Add a New Employee</h4></div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Name</label>

@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-My Offense
+My Event
 @endsection
 
 @section('style')
@@ -24,7 +24,7 @@ My Offense
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>My Offense</h1>
+        <h1>My Event</h1>
     </div>
     @include('notification')
     <div class="section-body">
@@ -32,7 +32,7 @@ My Offense
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Offense
+                        <h4>Event
                             <!---->
                         </h4>
                         <div class="card-header-action"></div>
@@ -41,31 +41,29 @@ My Offense
                         @if ($is_data_empty)
                             <div class="text-center p-3 text-muted">
                                 <h5>No Results</h5>
-                                <p>Looks like you have not added any Offense yet!</p>
+                                <p>Looks like you have not added any Event yet!</p>
                             </div>
                         @else
                             <table class="table table-striped" style="width: 100%">
                                 <thead>
                                     <tr>
                                         <th style="width: 5%;">No</th>
-                                        <th width="20%">Offense Name</th>
-                                        <th>Pinalty Type</th>
-                                        <th>Date</th>
-                                        <th>Punishment</th>
-
-                                        <th>Created At</th>
+                                        <th width="40%">Event Name</th>
+                                        <th>Note</th>
+                                        <th>Time</th>
+                                        <th>Place</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($data['ovense'] as $key => $value)
+                                    @foreach($event as $key => $value)
                                     <tr>
                                         <th>{{ $key+1 }}</th>
-                                        <th>{{ $value['ovense_name'] }}</th>
-                                        <th>{{ $value['pinalty_type'] }}</th>
-                                        <th>{{ $value['date'] }}</th>
-                                        <th>Rp.{{ number_format($value['punishment']) }}</th>
+                                        <th>{{ $value['event_name'] }}</th>
+                                        <th>{{ $value['note'] }}</th>
+                                        <th>{{ $value['time'] }}</th>
+                                        <th>{{ $value['place'] }}</th>
 
-                                        <th>{{ $value['created_at'] }}</th>
+                                        {{-- <th>{{ $value['created_at'] }}</th> --}}
                                     </tr>
                                     @endforeach
                                 </tbody>

@@ -100,4 +100,12 @@ class EventController extends Controller
     public function delete($id){
         return Event::where("id", $id)->where("company_id", session("company_id"))->delete();
     }
+
+    public function myEvent() {
+        $event = Event::where('company_id', session("company_id"))->get();
+
+        $is_data_empty = $event->count() == 0 ? true : false;
+
+        return view("event.myevent", compact("event", 'is_data_empty'));
+    }
 }

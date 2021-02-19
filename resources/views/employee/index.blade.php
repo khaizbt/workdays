@@ -35,14 +35,14 @@ Dashboard
                         <h4>Employee
                             <!---->
                         </h4>
-                        <div class="card-header-action"><a href="{{route('company.create')}}"
+                        <div class="card-header-action"><a href="{{route('employee.create')}}"
                                 class="btn btn-primary">Add <i class="fas fa-plus"></i></a></div>
                     </div>
                     <div class="card-body p-4">
                         @if ($is_data_empty)
                             <div class="text-center p-3 text-muted">
                                 <h5>No Results</h5>
-                                <p>Looks like you have not added any companies yet!</p>
+                                <p>Looks like you have not added any employee yet!</p>
                             </div>
                         @else
                             <table id="table-1" style="width: 100%">

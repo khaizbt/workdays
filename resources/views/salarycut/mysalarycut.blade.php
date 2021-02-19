@@ -32,10 +32,11 @@ My Salary Cut
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Saalry Cut
-                            <!---->
-                        </h4>
+                        <h4>Salary Cut
 
+                        </h4>
+                        <div class="card-header-action"></div>
+                    </div>
                     <div class="card-body p-4">
                         @if ($is_data_empty)
                             <div class="text-center p-3 text-muted">

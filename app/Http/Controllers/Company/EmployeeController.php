@@ -43,9 +43,9 @@ class EmployeeController extends Controller
 
     public function store(Request $request) {
         $post = $request->except("_token");
-        // return $post;
+        return $post;
         DB::beginTransaction();
-        try {
+        // try {
             $save = User::create([
                 'name' => $post['name'],
                 'email' => $post['email'],
@@ -53,7 +53,9 @@ class EmployeeController extends Controller
                 'level' => 3
             ]);
 
-            $user->assignRole("User");
+
+
+            $save->assignRole("User");
             $company = Company::where("id_user",2)->first();
             if($save) {
                 $employee = Employee::create([
@@ -71,10 +73,10 @@ class EmployeeController extends Controller
             DB::commit();
             return redirect('/company')->with(['success' => 'Employee has been created']);
 
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return redirect('/employee')->with(['error' => 'Create Employee Failed']);
-        }
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return redirect('/employee')->with(['error' => 'Create Employee Failed']);
+        // }
     }
 
     public function edit($id) {

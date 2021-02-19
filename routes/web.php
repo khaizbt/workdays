@@ -35,7 +35,7 @@ Route::prefix("employee")->middleware("auth")->group(function(){
     Route::post("update/{id}", "Company\EmployeeController@update")->name("employee.update")->middleware(['role:Admin']);
     Route::get("salary/data", "Holidays\ManageHolidaysController@countSalaryEmployeeAll")->name('salary.data')->middleware(['role:Admin']);
     Route::get('salary', "Company\EmployeeController@salary")->name('salary.index');
-    Route::get("salary/{employee}" , "Holidays\ManageHolidaysController@detailSalary")->name("salary.show");
+    Route::get("salary/{employee}" , "Holidays\ManageHolidaysController@detailSalary")->name("salary.show")->middleware(['role:Admin|User']);
     Route::get("data", "Company\EmployeeController@data")->name("employee.data")->middleware(['role:Admin']);
     Route::delete("delete/{id}", "Company\EmployeeController@delete")->middleware(['role:Admin']);
     Route::get("export-salary/{id}", "Holidays\ManageHolidaysController@exportPdf")->name('pdf.salary');
@@ -68,7 +68,7 @@ Route::prefix("ovense")->middleware("auth")->group(function(){
     Route::get("edit/{id}", "Company\OvenseController@edit")->name("ovense.edit")->middleware(['role:Admin']);
     Route::post("update/{id}", "Company\OvenseController@update")->name("ovense.update")->middleware(['role:Admin']);
     Route::delete("delete/{id}", "Company\OvenseController@delete")->name("ovense.delete")->middleware(['role:Admin']);
-    Route::get("my-ovense", "Company\OvenseController@myOvense");
+    Route::get("my-ovense", "Company\OvenseController@myOvense")->name("ovense.my")->middleware("role:User");
 });
 
 Route::prefix("salary-cut")->middleware("auth")->group(function(){
@@ -79,7 +79,7 @@ Route::prefix("salary-cut")->middleware("auth")->group(function(){
     Route::get("edit/{id}", "Company\SalaryCutController@edit")->name("salarycut.edit")->middleware(['role:Admin']);
     Route::post("update/{id}","Company\SalaryCutController@update")->name("salarycut.update")->middleware(['role:Admin']);
     Route::delete("delete/{id}", "Company\SalaryCutController@delete")->name("salarycut.delete")->middleware(['role:Admin']);
-    Route::get("my-salary-cut", "Company\SalaryCutController@mySalaryCut");
+    Route::get("my-salary-cut", "Company\SalaryCutController@mySalaryCut")->name('salarycut.my')->middleware(['role:User']);
 });
 
 Route::prefix("notification")->middleware("auth")->group(function(){
@@ -95,7 +95,7 @@ Route::prefix("event")->middleware("auth")->group(function(){
     Route::post("update/{id}", "EventController@update")->name("event.update")->middleware(['role:Admin']);
     Route::get("edit/{id}", "EventController@edit")->name("event.edit")->middleware(['role:Admin']);
     Route::delete("delete/{id}", "EventController@delete")->middleware(['role:Admin']);
-    Route::get('my-event', 'EventController@myEvent');
+    Route::get('my-event', 'EventController@myEvent')->name("event.my")->middleware(['role:User']);
 });
 
 

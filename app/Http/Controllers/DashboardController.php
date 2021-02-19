@@ -29,7 +29,7 @@ class DashboardController extends Controller
         //     return $value['data']['message'];
         // }
         $user = User::where('id', Auth::id())->first();
-        // dd($user);
+
         if(!$user->hasRole("Admin") && !$user->hasRole("User"))
             return view('admin.dashboard.index');
 
@@ -52,9 +52,11 @@ class DashboardController extends Controller
                 session(["company_id" => 0]);
 
         } elseif ($user['level'] == 3){
-            $company = Company::where('id_user', $user['id'])->first();
+
+            // return $company;
 
             $employee = Employee::where("user_id", Auth::id())->first();
+            $company = Company::where('id', $employee['company_id'])->first();
 
             session(["company_id" => $employee['company_id']]);
             $data['count_leave'] = self::countHolidaysEmployee();
