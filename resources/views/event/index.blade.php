@@ -1,9 +1,9 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Dashboard
+Edit Event
 @endsection
-
+@section('event', 'active')
 @section('style')
     <style>
         #table-1{

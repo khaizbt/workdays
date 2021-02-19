@@ -411,7 +411,7 @@ class ManageHolidaysController extends Controller
         // and you might want to convert to integer
         $numberDays = intval($numberDays+1);
 
-        $company = Company::where('id_user', Auth::id())->first();
+        $company = Company::where('id', session('company_id'))->first();
 
         if($numberDays > $company['maximum_leave']){
             return redirect("/leave")->with("success", "maximum leave is ".$company['maximum_leave'])." days";

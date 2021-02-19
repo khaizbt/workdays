@@ -1,18 +1,15 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Create Leave
-@endsection
-@section('style')
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+Edit Event
 @endsection
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Create Leave</h1>
+        <h1>Salary</h1>
         <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Leave</a></div>
-            <div class="breadcrumb-item">Create </div>
+            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Event</a></div>
+            <div class="breadcrumb-item">Edit  </div>
         </div>
     </div>
     <div class="section-body">
@@ -21,7 +18,7 @@ Create Leave
                 <div class="card">
                     <form action="{{route('event.update', Illuminate\Support\Facades\Crypt::encrypt($data['id']))}}" method="POST">
                         @csrf
-                        <div class="card-header"><h4>Add a New Event</h4></div>
+                        <div class="card-header"><h4>Edit a Event</h4></div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Event Name</label>

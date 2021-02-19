@@ -3,7 +3,7 @@
 @section('title')
 My Salary Cut
 @endsection
-
+@section('salary-cut', 'active')
 @section('style')
     <style>
         #table-1{
@@ -41,7 +41,7 @@ My Salary Cut
                         @if ($is_data_empty)
                             <div class="text-center p-3 text-muted">
                                 <h5>No Results</h5>
-                                <p>Looks like you have not added any companies yet!</p>
+                                <p>Looks like you don't have any salary cut yet!</p>
                             </div>
                         @else
                             <table class="table table-striped" style="width: 100%">

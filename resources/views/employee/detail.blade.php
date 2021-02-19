@@ -1,9 +1,9 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Dashboard
+Detail Salary
 @endsection
-@section('pre_setting_list', 'active')
+@section('salary', 'active')
 @section('style')
     <style>
         #table-1{

@@ -3,14 +3,14 @@
 @section('title')
 Dashboard
 @endsection
-
+@section('employee', 'active')
 @section('content')
 <section class="section">
   <div class="section-header">
-    <h1>Edit Companies</h1>
+    <h1>Manage Employee</h1>
     <div class="section-header-breadcrumb">
-        <div class="breadcrumb-item active"><a href="{{ route('company.index') }}">Companies</a></div>
-        <div class="breadcrumb-item">Edit Companies</div>
+        <div class="breadcrumb-item active"><a href="{{ route('company.index') }}">Employee</a></div>
+        <div class="breadcrumb-item">Edit Employee</div>
       </div>
   </div>
 
@@ -20,31 +20,28 @@ Dashboard
                 <div class="card">
                     <form action="{{route('employee.update', $employee['id'])}}" method="POST">
                         @csrf
-                        <div class="card-header"><h4>Add a New Company</h4></div>
+                        <div class="card-header"><h4>Add a New Employee</h4></div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Name</label>
-                                <input type="text" class="form-control" name="name" value="{{ $user['name'] }}">
+                                <input type="text" class="form-control" name="name" value="{{ $user['name'] }}" required>
                             </div>
                             <div class="form-group">
                                 <label for="title">Position</label>
-                                <input type="text" class="form-control" name="position" value="{{  $employee['position'] }}">
+                                <input type="text" class="form-control" name="position" value="{{  $employee['position'] }}" required>
                             </div>
-                            <div class="form-group">
-                                <label for="title">Status</label>
-                                <input type="text" class="form-control" name="status" value="{{ $employee['status'] }}">
-                            </div>
+
                             <div class="form-group">
                                 <label for="title">Email</label>
-                                <input type="email" class="form-control" name="email" value="{{ $user['email'] }}">
+                                <input type="email" class="form-control" name="email" value="{{ $user['email'] }}" required>
                             </div>
                             <div class="form-group">
                                 <label for="title">Password</label>
-                                <input type="password" class="form-control" name="password">
+                                <input type="password" placeholder="Password (Leave Blank if not change Password)" class="form-control" name="password">
                             </div>
                             <div class="form-group">
                                 <label for="title">Salary</label>
-                                <input type="number" class="form-control" name="salary" value="{{ $employee['salary'] }}">
+                                <input type="number" class="form-control" name="salary" value="{{ $employee['salary'] }}" required>
                             </div>
                         </div>
                             <div class="card-footer">

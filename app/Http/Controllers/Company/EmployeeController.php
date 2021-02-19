@@ -14,6 +14,7 @@ use App\Exports\UsersExport;
 use Auth;
 use Hash;
 use DB;
+use Validator;
 class EmployeeController extends Controller
 {
     public function index() {
@@ -43,16 +44,19 @@ class EmployeeController extends Controller
 
     public function store(Request $request) {
         $post = $request->except("_token");
+
         DB::beginTransaction();
-        // try {
+        try {
+            //Validasi Email
+            $user = User::where('email', $post['email'])->first();
+            if($user)
+                return redirect('/employee/create')->with(['error' => 'Email or Phone has been taken'])->withInput();
             $save = User::create([
                 'name' => $post['name'],
                 'email' => $post['email'],
                 'password' => Hash::make($post['password']),
                 'level' => 3
             ]);
-
-
 
             $save->assignRole("User");
             $company = Company::where("id_user",2)->first();
@@ -66,16 +70,14 @@ class EmployeeController extends Controller
                     "user_id" => $save['id'],
                 ]);
 
-
-
             }
             DB::commit();
             return redirect('/employee')->with(['success' => 'Employee has been created']);
 
-        // } catch (\Throwable $th) {
-        //     DB::rollback();
-        //     return redirect('/employee')->with(['error' => 'Create Employee Failed']);
-        // }
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect('/employee')->with(['error' => 'Create Employee Failed']);
+        }
     }
 
     public function edit($id) {

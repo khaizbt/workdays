@@ -3,7 +3,7 @@
 @section('title')
 My Event
 @endsection
-
+@section('event', 'active')
 @section('style')
     <style>
         #table-1{

@@ -3,7 +3,7 @@
 @section('title')
 Salary Cut
 @endsection
-
+@section('salary-cut', 'active')
 @section('style')
     <style>
         #table-1{
@@ -32,7 +32,7 @@ Salary Cut
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Salary Cut
+                        <h4>List Salary Cut
                             <!---->
                         </h4>
                         <div class="card-header-action"><a href="{{route('salarycut.create')}}"

@@ -3,16 +3,18 @@
 @section('title')
 Create Emplotee
 @endsection
-
+@section('employee', 'active');
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Create Employee</h1>
+        <h1>Manage Employee</h1>
         <div class="section-header-breadcrumb">
             <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Employeee</a></div>
             <div class="breadcrumb-item">Create Employee</div>
         </div>
     </div>
+    @include('notification')
+
     <div class="section-body">
         <div class="row">
             <div class="col-md-8 col-sm-12">
@@ -23,16 +25,13 @@ Create Emplotee
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Name</label>
-                                <input type="text" class="form-control" name="name">
+                                <input type="text" class="form-control" name="name" required>
                             </div>
                             <div class="form-group">
                                 <label for="title">Position</label>
-                                <input type="text" class="form-control" name="position">
+                                <input type="text" class="form-control" name="position" required>
                             </div>
-                            <div class="form-group">
-                                <label for="title">Status</label>
-                                <input type="text" class="form-control" name="status" value="active">
-                            </div>
+
                             <div class="form-group">
                                 <label for="title">Email</label>
                                 <input type="email" class="form-control" name="email">

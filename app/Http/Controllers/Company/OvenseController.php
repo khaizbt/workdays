@@ -95,7 +95,6 @@ class OvenseController extends Controller
                 "employee_id" => Crypt::decrypt($post['employee_id']),
             ]);
 
-            // $update->employee->user->notify(new OvensePublish($notification));
             DB::commit();
             return "sukses";
         } catch (\Throwable $th) {
@@ -115,5 +114,3 @@ class OvenseController extends Controller
         return view("ovense.my", compact('data', 'is_data_empty'));
     }
 }
-
-//TODO membuat tabel Salary dan diisi ketika ada perubahan gaji karyawan

@@ -7,7 +7,7 @@
 
 	@if ($message = Session::get('error'))
 	<div class="alert alert-danger">
-        <div class="alert-title">Danger</div>
+        <div class="alert-title">Error</div>
         {{ $message }}
       </div>
 	@endif

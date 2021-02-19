@@ -1,18 +1,16 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Create Leave
+Create Event
 @endsection
-@section('style')
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-@endsection
+@section('event', 'active')
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Create Leave</h1>
+        <h1>Manage Event</h1>
         <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Leave</a></div>
-            <div class="breadcrumb-item">Create </div>
+            <div class="breadcrumb-item active"><a href="{{ route('event.index') }}">Leave</a></div>
+            <div class="breadcrumb-item">Create Event</div>
         </div>
     </div>
     <div class="section-body">
@@ -25,19 +23,19 @@ Create Leave
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Event Name</label>
-                                <input type="text" class="form-control" name="event_name">
+                                <input type="text" class="form-control" name="event_name" required>
                             </div>
                             <div class="form-group">
                                 <label for="notes">Notes</label>
-                                <textarea name="note" id="" class="form-control" cols="30" rows="50"></textarea>
+                                <textarea name="note" id="" class="form-control" cols="30" rows="50" required></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="title">Date And Time</label>
-                                <input type="datetime-local" class="form-control" name="time" id="">
+                                <input type="datetime-local" class="form-control" name="time" id="" required>
                             </div>
                             <div class="form-group">
                                 <label for="value">Value</label>
-                                <input type="text"  class="form-control"name="place" id="">
+                                <input type="text"  class="form-control"name="place" id="" required>
                             </div>
                         </div>
                             <div class="card-footer">

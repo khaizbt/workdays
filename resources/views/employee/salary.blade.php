@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Dashboard
+Salary
 @endsection
 
 @section('style')
@@ -20,11 +20,11 @@ Dashboard
         }
     </style>
 @endsection
-
+@section('salary', 'active')
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Manage Leave</h1>
+        <h1>Salary</h1>
     </div>
     @include('notification')
     <div class="section-body">
@@ -32,11 +32,10 @@ Dashboard
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Leave
+                        <h4>List Salary
                             <!---->
                         </h4>
-                        <div class="card-header-action"><a href="{{route('leave.create')}}"
-                                class="btn btn-primary">Assign Leave <i class="fas fa-plus"></i></a>
+                        <div class="card-header-action">
 
                             <a href="{{ route('excel.salary') }}" class="btn btn-success">Export to Excel <i class="fa fa-file" aria-hidden="true"></i></a></div>
                     </div>
