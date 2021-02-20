@@ -7,7 +7,7 @@
     </div>
     <ul class="sidebar-menu">
         <li class="menu-header">Dashboard</li>
-        <li class="{{ Request::route()->getName() == 'admin.dashboard' ? ' active' : '' }}"><a class="nav-link" href="{{ route('admin.dashboard') }}"><i class="far fa-columns"></i> <span>Dashboard</span></a></li>
+        <li class="{{ Request::route()->getName() == 'admin.dashboard' ? ' active' : '' }}"><a class="nav-link" href="{{ route('admin.dashboard') }}"><i class="fa fa-columns"></i> <span>Dashboard</span></a></li>
 
         @role('Super')
         <li class="menu-header">Users</li>

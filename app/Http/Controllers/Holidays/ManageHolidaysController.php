@@ -252,6 +252,8 @@ class ManageHolidaysController extends Controller
                 return ($row['status'] == 1) ? "Cuti" : "Lainnya";
             })->addColumn('approved_str', function($row){
                 return ($row['is_approved'] == 1) ? "Approved" : "Rejected";
+            })->addColumn('charge_str', function($row){
+                return "Rp.".number_format($row['charge']);
             })
             ->addIndexColumn()
                 ->rawColumns(['action', 'status_str', 'approved_str'])
@@ -273,6 +275,10 @@ class ManageHolidaysController extends Controller
         $end = new DateTime($post['date_end']);
         $end = $end->modify( '+1 day' );
 
+        $post['charge'] = str_replace(['Rp', " ", "."], "", $post['charge']);
+
+
+
         $interval = DateInterval::createFromDateString('1 day');
         $period = new DatePeriod($begin, $interval, $end);
 
@@ -293,7 +299,7 @@ class ManageHolidaysController extends Controller
         }
 
         DB::beginTransaction();
-        try {
+        // try {
             $post['employee_id'] = Crypt::decryptString($post['employee']);
             $save = Holiday::create($post);
             // return $save;
@@ -314,10 +320,10 @@ class ManageHolidaysController extends Controller
             $save->employee->user->notify(new AssignLeave($notification));
             DB::commit();
             return redirect("/leave")->with("success", "Leave has been assigned");
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return redirect("/leave")->with("error", "Assign Leave Failed #RT435");
-        }
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return redirect("/leave")->with("error", "Assign Leave Failed #RT438");
+        // }
 
     }
 
@@ -349,6 +355,7 @@ class ManageHolidaysController extends Controller
 
             // and you might want to convert to integer
             $numberDays = intval($numberDays+1);
+            $post['charge'] = str_replace(['Rp', " ", "."], "", $post['charge']);
 
             $company = Company::where('id_user', Auth::id())->first();
 

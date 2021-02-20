@@ -41,7 +41,7 @@ Dashboard
                             </div>
                             <div class="form-group">
                                 <label for="title">Salary</label>
-                                <input type="number" class="form-control" name="salary" value="{{ $employee['salary'] }}" required>
+                                <input type="text" class="form-control input_mask_currency" name="salary" value="{{ $employee['salary'] }}" required>
                             </div>
                         </div>
                             <div class="card-footer">
@@ -57,4 +57,19 @@ Dashboard
 </section>
 @endsection
 @section('scripts')
+<script src="{{ asset('assets/modules/jinputmask.js') }}"></script>
+
+<script src="{{ asset('assets/modules/inputmask.js') }}"></script>
+<script>
+$(".input_mask_currency").inputmask({
+    rightAlign: false,
+    prefix : 'Rp ',
+    radixPoint: ',',
+    groupSeparator: ".",
+    alias: "numeric",
+    autoGroup: true,
+    digits: 0,
+    min: 0
+});
+</script>
 @endsection

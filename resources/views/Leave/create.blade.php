@@ -46,7 +46,7 @@ Create Leave
                             </div>
                             <div class="form-group">
                                 <label for="title">Charge</label>
-                                <input type="number" class="form-control" name="charge">
+                                <input type="text" class="form-control input_mask_currency" name="charge">
                             </div>
                             <div class="form-group">
                                 <label for="">Date</label>
@@ -83,18 +83,19 @@ Create Leave
 </section>
 @endsection
 @section('scripts')
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="{{ asset('assets/modules/jinputmask.js') }}"></script>
+
+<script src="{{ asset('assets/modules/inputmask.js') }}"></script>
 <script>
-    $( function() {
-    $( "#date_range" ).daterangepicker({
-        "minDate": moment(),
-        "maxSpan": {
-        "days": 2
-    },
-}, function(start, end, label) {
-  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+$(".input_mask_currency").inputmask({
+    rightAlign: false,
+    prefix : 'Rp ',
+    radixPoint: ',',
+    groupSeparator: ".",
+    alias: "numeric",
+    autoGroup: true,
+    digits: 0,
+    min: 0
 });
-    });
-  </script>
-{{-- <script src="{{ asset("assets/js/page/datepicker.js") }}"></script> --}}
+</script>
 @endsection

@@ -118,8 +118,8 @@ Dashboard
                 name: 'approved_str'
             },
             {
-                data: 'charge',
-                name: 'charge'
+                data: 'charge_str',
+                name: 'charge_str'
             },
             {
                 data: 'action',

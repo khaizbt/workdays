@@ -31,10 +31,14 @@ class EmployeeController extends Controller
                 ->addColumn('action', function ($data) {
                     return "<a href='".route('employee.edit', [$data['id']])."'><i class='fa fa-edit text-info'></i></a>
                     | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+            })->addColumn('salary_str', function($row){
+                return "Rp.".number_format($row['salary']);
             })
             ->addIndexColumn()
                 ->rawColumns(['action'])
                 ->make(true);
+        } else {
+            return "Request Not Allowed";
         }
     }
 
@@ -48,6 +52,7 @@ class EmployeeController extends Controller
         DB::beginTransaction();
         try {
             //Validasi Email
+            $post['salary'] = str_replace(['Rp', " ", "."], "", $post['salary']);
             $user = User::where('email', $post['email'])->first();
             if($user)
                 return redirect('/employee/create')->with(['error' => 'Email or Phone has been taken'])->withInput();
@@ -102,7 +107,7 @@ class EmployeeController extends Controller
         try {
 
             $employee = Employee::where('id', $id)->first();
-
+            $post['salary'] = str_replace(['Rp', " ", "."], "", $post['salary']);
             $update = $employee->update([
                 "name" => $post['name'],
                 "position" => $post['position'],

@@ -95,8 +95,8 @@ Dashboard
                 name: 'position'
             },
             {
-                data: 'salary',
-                name: 'salary'
+                data: 'salary_str',
+                name: 'salary_str'
             },
             {
                 data: "created_at",
