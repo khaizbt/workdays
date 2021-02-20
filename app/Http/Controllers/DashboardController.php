@@ -24,10 +24,6 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request)
     {
-        // return Auth::user()->unreadNotifications[0];
-        // foreach(Auth::user()->unreadNotifications as $key => $value){
-        //     return $value['data']['message'];
-        // }
         $user = User::where('id', Auth::id())->first();
 
         if(!$user->hasRole("Admin") && !$user->hasRole("User"))
@@ -37,16 +33,12 @@ class DashboardController extends Controller
         $data;
         if($user['level'] == 2) {
             $company = Company::where('id_user', $user['id'])->first();
-
-
-            // return self::countWorking();
-            // return $company;
             if($company){
                 session(["company_id" => $company['id']]);
                 $data['count_working'] = self::countWorking();
                 $data['count_employee'] = self::employeeCount();
                 $data['count_leave'] = self::countLeave();
-                $data['gajian'] = date('l, '.$company['date_salary'].' F Y');
+                $data['gajian'] = date('l, d F Y', strtotime(date('Y-m-'.$company['date_salary'])));
             }
             else
                 session(["company_id" => 0]);
@@ -62,12 +54,9 @@ class DashboardController extends Controller
             $data['count_leave'] = self::countHolidaysEmployee();
             $data['count_working'] = self::countWorking();
             $data['ovense'] = self::ovense();
-            $data['gajian'] = date('l, '.$company['date_salary'].' F Y');
-
-
-
+            $data['gajian'] = date('l, d F Y', strtotime(date('Y-m-'.$company['date_salary'])));
         }
-        // return $data;
+
         return view('admin.dashboard.index', compact('data'));
     }
 

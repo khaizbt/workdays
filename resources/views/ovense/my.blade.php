@@ -41,7 +41,7 @@ My Offense
                         @if ($is_data_empty)
                             <div class="text-center p-3 text-muted">
                                 <h5>No Results</h5>
-                                <p>Looks like you have not added any Offense yet!</p>
+                                <p>Looks like you't have any Offense yet!</p>
                             </div>
                         @else
                             <table class="table table-striped" style="width: 100%">
@@ -59,13 +59,13 @@ My Offense
                                 <tbody>
                                     @foreach($data['ovense'] as $key => $value)
                                     <tr>
-                                        <th>{{ $key+1 }}</th>
-                                        <th>{{ $value['ovense_name'] }}</th>
-                                        <th>{{ $value['pinalty_type'] }}</th>
-                                        <th>{{ $value['date'] }}</th>
-                                        <th>Rp.{{ number_format($value['punishment']) }}</th>
+                                        <td>{{ $key+1 }}</td>
+                                        <td>{{ $value['ovense_name'] }}</td>
+                                        <td>{{ $value['pinalty_type'] }}</td>
+                                        <td>{{ $value['date'] }}</td>
+                                        <td>Rp.{{ number_format($value['punishment']) }}</td>
 
-                                        <th>{{ $value['created_at'] }}</th>
+                                        <td>{{ $value['created_at'] }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>

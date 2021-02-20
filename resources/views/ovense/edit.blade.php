@@ -29,7 +29,7 @@ Edit Offense
                             </div>
                             <div class="form-group">
                                 <label for="title">Employee</label>
-                                <select name="employee_id" id="select2" class="form-control">
+                                <select name="employee" id="select2" class="form-control">
                                     <option value="">Choose Employee</option>
                                     @foreach($employee as $key => $value)
                                         <option value="{{ Illuminate\Support\Facades\Crypt::encrypt($value['id']) }}" {{ ($value['id'] == $data['employee_id']) ? 'selected' : "" }}>{{$value['name']}}</option>
@@ -50,7 +50,7 @@ Edit Offense
                             </div>
                             <div class="form-group" id="punishment">
                                 <label for="title">Punishment</label>
-                                <input type="number" value="{{ $data['punishment'] }}" class="form-control" name="punishment">
+                                <input type="text" value="{{ $data['punishment'] }}" class="form-control input_mask_currency" name="punishment">
                             </div>
                             <div class="form-group">
                                 <label for="">Date</label>
@@ -72,18 +72,23 @@ Edit Offense
 </section>
 @endsection
 @section('scripts')
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="{{ asset('assets/modules/jinputmask.js') }}"></script>
+
+<script src="{{ asset('assets/modules/inputmask.js') }}"></script>
 <script>
-    $( function() {
-    $( "#date_range" ).daterangepicker({
-        "minDate": moment(),
-        "maxSpan": {
-        "days": 2
-    },
-}, function(start, end, label) {
-  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+$(".input_mask_currency").inputmask({
+    rightAlign: false,
+    prefix : 'Rp ',
+    radixPoint: ',',
+    groupSeparator: ".",
+    alias: "numeric",
+    autoGroup: true,
+    digits: 0,
+    min: 0
 });
-    });
-  </script>
-{{-- <script src="{{ asset("assets/js/page/datepicker.js") }}"></script> --}}
+
+$(document).ready(function(){
+    $('#select2').select2();
+})
+</script>
 @endsection

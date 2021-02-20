@@ -56,7 +56,7 @@ Route::prefix("leave")->middleware("auth")->group(function(){
     Route::get("count-cuti", "Holidays\ManageHolidaysController@countWorking");
     Route::get("count-cuti-employee", "Holidays\ManageHolidaysController@countHolidaysEmployee");
     Route::get("my-leave/data", "Holidays\ManageHolidaysController@listMyLeave")->name("myleave.data");
-    Route::get("my-leave", "Holidays\ManageHolidaysController@myLeave");
+    Route::get("my-leave", "Holidays\ManageHolidaysController@myLeave")->name('leave.my');
     Route::post("reject/{id}", "Holidays\ManageHolidaysController@reject");
 });
 

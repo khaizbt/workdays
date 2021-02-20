@@ -630,7 +630,7 @@ class ManageHolidaysController extends Controller
             $q->whereBetween("date", ["2021-02-01", $last_day]);
         }])->with(['holiday_paid' => function($query) use($begin, $last_day){
             $query->whereHas("leave_date", function($que) use($begin, $last_day){
-                $que->whereBetween("date", ["2021-01-01", $last_day]);
+                $que->whereBetween("date", [$begin, $last_day]);
             });
         }])->with(['salary_cut' => function($q)  use($begin, $last_day){
             $q->whereBetween("created_at", [$begin, $last_day]);
@@ -691,10 +691,10 @@ class ManageHolidaysController extends Controller
 
 
         $employee = Employee::where('user_id', $employee)->with(['ovense' => function($q) use($begin, $last_day){
-            $q->whereBetween("date", ["2021-02-01", $last_day]);
+            $q->whereBetween("date", [$begin, $last_day]);
         }])->with(['holiday_paid' => function($query) use($begin, $last_day){
             $query->whereHas("leave_date", function($que) use($begin, $last_day){
-                $que->whereBetween("date", ["2021-01-01", $last_day]);
+                $que->whereBetween("date", [$begin, $last_day]);
             });
         }])->with(['salary_cut' => function($q)  use($begin, $last_day){
             $q->whereBetween("created_at", [$begin, $last_day]);
@@ -761,7 +761,7 @@ class ManageHolidaysController extends Controller
             $q->whereBetween("date", ["2021-02-01", $last_day]);
         }])->with(['holiday_paid' => function($query) use($begin, $last_day){
             $query->whereHas("leave_date", function($que) use($begin, $last_day){
-                $que->whereBetween("date", ["2021-01-01", $last_day]);
+                $que->whereBetween("date", [$begin, $last_day]);
             });
         }])->with(['salary_cut' => function($q)  use($begin, $last_day){
             $q->whereBetween("created_at", [$begin, $last_day]);

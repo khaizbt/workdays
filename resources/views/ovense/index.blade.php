@@ -100,8 +100,8 @@ Offense
                 name: 'pinalty_type'
             },
             {
-                data: 'punishment',
-                name: 'punishment'
+                data: 'punishment_str',
+                name: 'punishment_str'
             },
             {
                 data: 'date',

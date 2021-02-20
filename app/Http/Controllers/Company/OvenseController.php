@@ -11,6 +11,7 @@ use App\Models\EmployeeSalary;
 use App\Notifications\OvensePublish;
 use DataTables;
 use DB;
+use Validator;
 
 class OvenseController extends Controller
 {
@@ -31,6 +32,8 @@ class OvenseController extends Controller
                 ->addColumn('action', function ($data) {
                     return "<a href='".route('ovense.edit', [Crypt::encrypt($data['id'])])."'><i class='fa fa-edit text-info'></i></a>
                     | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+            })->addColumn("punishment_str", function($row){
+                return "Rp.".number_format($row['punishment']);
             })
             ->addIndexColumn()
                 ->rawColumns(['action'])
@@ -41,21 +44,29 @@ class OvenseController extends Controller
     public function create() {
         $employee = Employee::where("company_id", session("company_id"))->get();
 
-        // di view id employee dibuat Illuminate\Support\Facades\Crypt::encrypt($value['id]);
-
         return view("ovense.create", compact("employee"));
     }
 
     public function store(Request $request) {
         $post = $request->except("_token");
-        // return $post;
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'date' => 'required',
+            'employee' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('ovense/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
         DB::beginTransaction();
         try {
             if($post['punishment'] == null)
                 $post['punishment'] = 0;
             $message = $post['ovense_name'].", You Charge = ".$post['punishment'];
-            $post['employee_id'] = Crypt::decryptString($post['employee_id']);
-            // return $post;
+            $post['employee_id'] = Crypt::decryptString($post['employee']);
+            $post['punishment'] = str_replace(["Rp", " ", ".",","], "", $post['punishment']);
             $save = Ovense::create($post);
 
 
@@ -66,24 +77,34 @@ class OvenseController extends Controller
             ];
             $save->employee->user->notify(new OvensePublish($notification));
             DB::commit();
-            return "sukses";
+            return redirect("/ovense")->withSuccess(['Ovense has been created']);
         } catch (\Throwable $th) {
             DB::rollback();
-            // return false;
-            return "error";
+            return redirect("/ovense")->withErrors(['Create Ovense Failed, Please Try again later #RER141']);
         }
     }
 
     public function edit($id) {
         $data = Ovense::where('id', Crypt::decrypt($id))->with("employee")->first();
         $employee = Employee::where("company_id", session("company_id"))->get();
-        // return $data;
+
         return view("ovense.edit", compact("data", "employee"));
     }
 
     public function update(Request $request, $id) {
         $post = $request->except('_token', 'id');
         $post['id'] = Crypt::decrypt($id);
+        $validator = Validator::make($post, [
+            'name' => 'required|max:255',
+            'date' => 'required',
+            'employee' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('ovense/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
 
         DB::beginTransaction();
         try {
@@ -92,7 +113,7 @@ class OvenseController extends Controller
                 "pinalty_type" => $post['pinalty_type'],
                 "date" => $post['date'],
                 "punishment" => $post['punishment'],
-                "employee_id" => Crypt::decrypt($post['employee_id']),
+                "employee_id" => Crypt::decrypt($post['employee']),
             ]);
 
             DB::commit();
