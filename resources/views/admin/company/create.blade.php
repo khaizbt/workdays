@@ -53,7 +53,7 @@ Create Company
                             <div class="form-group">
                                 <label for="logo">Logo</label>
                                 <input type="file" value="demo" name="logo" class="form-control">
-                                <span>Logo Ini akan dipakai pada Slip gaji karyawan dan sebagainya</span>
+                                <span><i>Logo Ini akan dipakai pada Slip gaji karyawan dan sebagainya</i></span>
                             </div>
                             <div class="form-group">
                                 <label for="title">Company Email</label>
@@ -95,4 +95,9 @@ Create Company
 </section>
 @endsection
 @section('scripts')
+<script>
+    $(document).ready(function() {
+    $('#select2').select2();
+});
+</script>
 @endsection

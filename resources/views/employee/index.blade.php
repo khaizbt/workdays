@@ -51,8 +51,9 @@ Dashboard
                                         <th style="width: 5%;">No</th>
                                         <th width="40%">Employee Name</th>
                                         <th>Position</th>
-                                        <th>Status</th>
+
                                         <th>Salary</th>
+                                        <th>Registered Date</th>
                                         <th style="width: 10%;">Action</th>
                                     </tr>
                                 </thead>
@@ -94,12 +95,12 @@ Dashboard
                 name: 'position'
             },
             {
-                data: 'status',
-                name: 'status'
-            },
-            {
                 data: 'salary',
                 name: 'salary'
+            },
+            {
+                data: "created_at",
+                name: "created_at"
             },
             {
                 data: 'action',

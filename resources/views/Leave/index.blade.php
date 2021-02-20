@@ -19,7 +19,7 @@ Dashboard
         }
     </style>
 @endsection
-
+@section('leave', 'active')
 @section('content')
 <section class="section">
     <div class="section-header">

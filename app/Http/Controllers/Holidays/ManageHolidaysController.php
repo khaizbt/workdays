@@ -173,7 +173,7 @@ class ManageHolidaysController extends Controller
                 $date_holidays = strtotime($key1);
                 $is_holidays = date("N", $date_holidays);
 
-                    if(!in_array($is_holidays, [6,7])){
+                    if(!in_array($is_holidays, [6,7])){ //TODO Masih HardCod
                         $no_days++;
                     }
                 }

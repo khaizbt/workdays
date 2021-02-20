@@ -3,7 +3,7 @@
 @section('title')
 My Leave
 @endsection
-
+@section('leave', 'active')
 @section('style')
     <style>
         #table-1{

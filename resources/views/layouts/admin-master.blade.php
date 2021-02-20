@@ -53,7 +53,6 @@
   <script src="{{ asset('assets/js/datatables/dataTables.bootstrap4.min.js') }}"></script>
   <script src="{{ asset('assets/js/datatables/dataTables.select.min.js') }}"></script>
   <script src="{{ asset('assets/js/page/select2.full.min.js') }}"></script>
-  <script src="assets/modules/sweetalert.min.js"></script>
   @yield('scripts')
 </body>
 </html>
