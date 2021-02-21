@@ -392,7 +392,9 @@ class ManageHolidaysController extends Controller
             // and you might want to convert to integer
             $numberDays = intval($numberDays+1);
             $post['charge'] = str_replace(['Rp', " ", "."], "", $post['charge']);
-
+            if($post['charge'] == ""){
+                $post['charge'] = 0;
+            }
             $company = Company::where('id_user', Auth::id())->first();
 
             if($numberDays > $company['maximum_leave']){
@@ -467,7 +469,7 @@ class ManageHolidaysController extends Controller
         $company = Company::where('id', session('company_id'))->first();
 
         if($numberDays > $company['maximum_leave']){
-            return redirect("/leave")->with("success", "maximum leave is ".$company['maximum_leave'])." days";
+            return redirect("/leave")->withErrors(["maximum leave is ".$company['maximum_leave']." days"]);
         }
         DB::beginTransaction();
         try {
@@ -492,10 +494,10 @@ class ManageHolidaysController extends Controller
             $company->user->notify(new SubmitLeave($notification));
             DB::commit();
 
-            return redirect("/leave/my-leave")->with("success", "Leave has been submitted");
+            return redirect("/leave/my-leave")->withSuccess(["Leave has been submitted"]);
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect("/leave/my-leave")->with("error", "Submit Leave Failed");
+            return redirect("/leave/my-leave")->withErrors(["Submit Leave Failed"]);
         }
     }
 
@@ -510,7 +512,7 @@ class ManageHolidaysController extends Controller
         ];
         $data->employee->user->notify(new ApproveLeave($notification));
 
-        return redirect("/leave")->with("success", "Leave has been approved");
+        // return redirect("/leave")->with("success", "Leave has been approved");
     }
 
     public function reject(Request $request,$id) {
