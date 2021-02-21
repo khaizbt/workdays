@@ -56,7 +56,8 @@ class SalaryCutController extends Controller
         DB::beginTransaction();
 
         try {
-            $post['employee_id'] = Crypt::decryptString($post['employee_id']);
+        $post['employee_id'] = Crypt::decryptString($post['employee_id']);
+        $post['value'] = str_replace(['Rp', ',', '.', " "],"", $post['value']);
 
         if(isset($post['image']) && $post['image'] != null) {
             $upload = MyHelper::uploadFile($post['image'], "company/salary-cut/");
@@ -78,10 +79,10 @@ class SalaryCutController extends Controller
         }
 
         DB::commit();
-        return redirect('/salary-cut')->with(['success' => 'Salary Cut has been created']);
+        return redirect('/salary-cut')->withSuccess(['Salary Cut has been created']);
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect('/salary-cut')->with(['error' => 'Create Salary Cut Failed']);
+            return redirect('/salary-cut')->withErrors(['Create Salary Cut Failed']);
         }
     }
 
@@ -99,6 +100,7 @@ class SalaryCutController extends Controller
         DB::beginTransaction();
         try {
             $data = SalaryCuts::where("id", Crypt::decrypt($id))->first();
+            $post['value'] = str_replace(['Rp', ',', '.', " "],"", $post['value']);
 
             if($data['status'] == 1 && $post['value'] != $data['value']){
                 $employee = Employee::where("id", Crypt::decrypt($post['employee_id']))->first();
@@ -135,24 +137,34 @@ class SalaryCutController extends Controller
             ]);
         }
         DB::commit();
-        return redirect('/salary-cut')->with(['success' => 'Salary Cut has been updated']);
+        return redirect('/salary-cut')->withSuccess(['Salary Cut has been updated']);
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect('/salary-cut')->with(['error' => 'Update Salary Cut failed']);
+            return redirect('/salary-cut')->withErrors(['Update Salary Cut failed']);
         }
     }
 
 
     public function delete($id) {
         $data = SalaryCuts::where("id", $id)->first();
-
+        DB::beginTransaction();
         if($data['status'] == 1){
             $employee = Employee::where("id", $data['employee_id'])->first();
             $employee->update([
                 "salary" => $employee['salary'] + $data['value'],
             ]);
         }
-        return $data->delete();
+
+
+        $data  = $data->delete();
+        if($data) {
+            DB::commit();
+            return 1;
+        }
+
+        DB::rollback();
+        return 0;
+
     }
 
     public function mySalaryCut() {
