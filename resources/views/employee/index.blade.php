@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Dashboard
+Employee List
 @endsection
 
 @section('style')

@@ -1,7 +1,7 @@
 @extends('layouts.admin-master')
 
 @section('title')
-Dashboard
+Leave List
 @endsection
 @section('style')
     <style>
