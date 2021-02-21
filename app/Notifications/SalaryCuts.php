@@ -16,9 +16,10 @@ class SalaryCuts extends Notification
      *
      * @return void
      */
-    public function __construct()
+    protected $salarycut;
+    public function __construct($salarycut)
     {
-        //
+        $this->salarycut = $salarycut;
     }
 
     /**
@@ -29,7 +30,7 @@ class SalaryCuts extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['database'];
     }
 
     /**
@@ -57,5 +58,10 @@ class SalaryCuts extends Notification
         return [
             //
         ];
+    }
+
+    public function toDatabase($notifiable)
+    {
+        return $this->salarycut;
     }
 }

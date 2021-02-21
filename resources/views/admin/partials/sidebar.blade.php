@@ -11,14 +11,14 @@
 
         @role('Super')
         <li class="menu-header">Users</li>
-        <li class="{{ Request::route()->getName() == 'admin.users' ? ' active' : '' }}"><a class="nav-link" href="{{ route('admin.users') }}"><i class="far fa-users"></i> <span>Users</span></a></li>
+        <li class="{{ Request::route()->getName() == 'admin.users' ? ' active' : '' }}"><a class="nav-link" href="{{ route('admin.users') }}"><i class="fa fa-users"></i> <span>Admin</span></a></li>
         @endrole
 
         <li class="menu-header">Company</li>
-        <li class="{{ Request::route()->getName() == 'holiday.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('holiday.index') }}"><i class="far fa-calendar-alt"></i> <span>Calendar</span></a></li>
+        <li class="{{ Request::route()->getName() == 'holiday.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('holiday.index') }}"><i class="fa fa-calendar-alt"></i> <span>Calendar</span></a></li>
 
         @role("Super")
-        <li class="{{ Request::route()->getName() == 'company.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('company.index') }}"><i class="far fa-globe"></i> <span>Manage Company</span></a></li>
+        <li class="{{ Request::route()->getName() == 'company.index' ? ' active' : '' }}"><a class="nav-link" href="{{ route('company.index') }}"><i class="fa fa-globe"></i> <span>Manage Company</span></a></li>
 
         @endrole
         @role("Admin")

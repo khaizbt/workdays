@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Crypt;
 use App\Notifications\EventSubmit;
 use DataTables;
 use DB;
+use Validator;
+use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
@@ -38,7 +40,19 @@ class EventController extends Controller
     public function store(Request $request) {
         $post = $request->except("_token");
         $post['company_id'] = session("company_id");
+        $validator = Validator::make($post, [
+            'event_name' => 'required|max:100',
+            // 'notes' => 'required|min:10',
+            'note' => 'required',
+            'time' => 'required',
+            'place' =>'required',
 
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('salary-cut')
+                        ->withErrors($validator);
+        }
         // return $post;
         DB::beginTransaction();
         try {

@@ -9,6 +9,9 @@ use App\Http\Requests\{UserUpdateRequest,UserAddRequest};
 use Spatie\Permission\Models\Role;
 use App;
 use Auth;
+use Validator;
+use Illuminate\Validation\Rule;
+
 
 class UserController extends Controller
 {
@@ -53,19 +56,25 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(UserAddRequest $request)
+    public function store(Request $request)
     {
-        // $request->level = 2;
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:100',
+            // 'notes' => 'required|min:10',
+            'email' => 'required|unique:users,email',
+            'password' => 'required|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('admin/users/create')
+                        ->withErrors($validator);
+        }
+
         $post = $request->all();
         $post['level'] = 2;
         $post['password'] = \Hash::make($post['password']);
         $user = User::create($post);
-        // $role = Role::find($request->role);
-        // if($role)
-        // {
-        //     $user->assignRole($role);
-        // }
-        return response()->json($user);
+        return redirect('admin/users')->withSuccess(['Admin has been created']);
     }
 
     /**
@@ -87,6 +96,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        // return $user;
         if(Auth::user()->hasRole('Super'))
             return view('admin.users.edit', compact('user'));
 
@@ -94,9 +104,39 @@ class UserController extends Controller
         if($user['id'] != Auth::id() )
             return redirect('/');
 
+
+
         return view('admin.users.edit', compact('user'));
     }
 
+    public function updateUser(Request $request, $id){
+        // $post = $request->only("name", "")
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:100',
+            // 'notes' => 'required|min:10',
+            'email' => ['required', Rule::unique('users')->ignore($id)],
+            'password' => 'confirmed',
+        ]);
+
+        if ($validator->fails()) {
+           return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $post = $request->only('name', 'email', 'password');
+        $user = User::where('id', $id)->first();
+        $update = $user->update([
+            'name' => $post['name'],
+            "email" => $post['email']
+        ]);
+
+        if(isset($post['password']) && $post['password'] != null) {
+            $data->update([
+                "password" => \Hash::make($post['password']),
+            ]);
+        }
+
+        return redirect()->back()->withSuccess(['User has been updated'])->withInput();
+    }
     /**
      * Update the specified resource in storage.
      *
@@ -106,8 +146,9 @@ class UserController extends Controller
      */
     public function update(UserUpdateRequest $request, User $user)
     {
-        if(!App::environment('demo'))
-        {
+        // return $request;
+        // if(!App::environment('demo'))
+        // {
             $user->update($request->only([
                 'name', 'email'
             ]));
@@ -125,7 +166,7 @@ class UserController extends Controller
                     $user->syncRoles([$role]);
                 }
             }
-        }
+        // }
 
         return response()->json($user);
     }

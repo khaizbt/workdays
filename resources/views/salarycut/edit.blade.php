@@ -31,7 +31,7 @@ Edit Salary Cut
                             </div>
                             <div class="form-group">
                                 <label for="title">Employee</label>
-                                <select name="employee_id" id="select2" class="form-control">
+                                <select name="employee" id="select2" class="form-control">
                                     <option value="">Choose Employee</option>
                                     @foreach($employee as $key => $value)
                                         <option value="{{ Illuminate\Support\Facades\Crypt::encrypt($value['id']) }}" {{ ($value['id'] == $data['employee_id']) ? "selected" : "" }}>{{$value['name']}}</option>

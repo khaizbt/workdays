@@ -30,7 +30,7 @@ Dashboard
                   </div>
                   <div class="card-stats-item">
                     <div class="card-stats-item-count">{{ $data['count_leave'] }}</div>
-                    <div class="card-stats-item-label">Cuti</div>
+                    <div class="card-stats-item-label">Cuti Dibulan ini</div>
                   </div>
                 </div>
               </div>
