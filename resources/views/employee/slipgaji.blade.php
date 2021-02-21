@@ -18,18 +18,17 @@
     </style>
 </head>
 <body>
-    <table width="100%" style="font-family:Arial, Helvetica, sans-serif; font-size:0.85em">
+    <table width="100%" style="font-family:Arial, Helvetica, sans-serif; font-size:0.85em; border-bottom:1px solid black">
         <tr>
-            <td width="25" align="center"><img src="{{ asset('assets/img/stisla-fill.svg') }}" alt="logo" width="100"></td>
+            <td width="25" align="center"><img src="{{ asset('assets/img/stisla-fill.png') }}" alt="logo" width="100"></td>
             <td width="50" align="center">
                 <h1>{{ $employee['company']['name'] }}</h1>
                 <p>{{ $employee['company']['address'] }}</p>
                 <p>{{ $employee['company']['email'] ." | ". $employee['company']['phone'] }}</p>
             </td>
-            <td width="25" align="center"><img src="{{ asset('assets/img/stisla-fill.svg') }}" alt="logo" width="100"></td>
+            <td width="25" align="center"><div style="visibility: hidden"><img src="{{ asset('assets/img/stisla-fill.png') }}" alt="logo" width="100"></div></td>
         </tr>
     </table>
-<hr>
 <br>
 <div style="margin-left: 50px">
     <table style="font-family:Arial, Helvetica, sans-serif; font-size:0.85em">
@@ -134,7 +133,7 @@
                 <th class="td" scope="row">{{ $key_cut+1 }}</th>
                     <td class="td">{{ $value_cut['cuts_name'] }}</td>
                     <td class="td">{{ $value_cut['Notes'] }}</td>
-                    <td><img width="100px" src="{{ route('get.file', str_replace("/", "+", $value_cut['image'])) }}" alt=""></td>
+                    <td><img src="{{storage_path('app/'.$value_cut['image'])}}" width="50"></td>
                     <td class="td">{{ $value_cut['value'] }}</td>
             </tr>
             @empty

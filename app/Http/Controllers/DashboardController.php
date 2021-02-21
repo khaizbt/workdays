@@ -65,10 +65,13 @@ class DashboardController extends Controller
     }
 
     public function getFile($file){
-        $file_storage = str_replace('+', '/', $file);
-        $file = Storage::disk('local')->get($file_storage);
+        // $file_storage = str_replace('+', '/', $file);
+        // $file = Storage::disk('local')->get($file_storage);
 
-        return Image::make($file)->response();
+        // return Image::make($file)->response();
+
+        $image = Image::make(Storage::disk('local')->get($file));
+        return Response::make($image->encode('png'), 200, ['Content-Type' => 'image/png']);
     }
 
     public function countHolidays($begin_date, $end_date){

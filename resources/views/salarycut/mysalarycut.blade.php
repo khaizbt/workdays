@@ -62,7 +62,7 @@ My Salary Cut
                                         <td>{{ $key+1 }}</td>
                                         <td>{{ $value['cuts_name'] }}</td>
                                         <td>{{ $value['notes'] }}</td>
-                                        <td><img width="100px" src="{{ route("get.file", str_replace("/", "+", $value['image'])) }}" alt=""> </td>
+                                        <td><img width="100px" src="{{ str_replace('/file/', '../storage/app/', url('file/'.$value['image'])) }}" alt=""> </td>
                                         <td>Rp.{{ number_format($value['value']) }}</td>
                                         <td>{{ ($value['status'] == 1) ? "Dipotong Perbulan" : "Dipotong 1x" }}</td>
                                         <td>{{ $value['created_at'] }}</td>
