@@ -69,7 +69,8 @@ Dashboard
                                 <thead>
                                     <tr>
                                         <th style="width: 5%;">No</th>
-                                        <th width="40%">Leave Name</th>
+                                        <th width="30%">Leave Name</th>
+                                        <th>Employee Name</th>
                                         <th>Type</th>
                                         <th>Status</th>
                                         <th>Charge</th>
@@ -104,6 +105,10 @@ Dashboard
                 name: 'DT_RowIndex',
                 searchable: false,
                 orderable: false
+            },
+            {
+                data: 'leave_name',
+                name: 'leave_name'
             },
             {
                 data: 'employee.name',
