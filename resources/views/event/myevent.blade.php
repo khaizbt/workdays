@@ -52,17 +52,18 @@ My Event
                                         <th>Note</th>
                                         <th>Time</th>
                                         <th>Place</th>
+                                        <th>Maps</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($event as $key => $value)
                                     <tr>
-                                        <th>{{ $key+1 }}</th>
-                                        <th>{{ $value['event_name'] }}</th>
-                                        <th>{{ $value['note'] }}</th>
-                                        <th>{{ $value['time'] }}</th>
-                                        <th>{{ $value['place'] }}</th>
-
+                                        <td>{{ $key+1 }}</td>
+                                        <td>{{ $value['event_name'] }}</td>
+                                        <td>{{ $value['note'] }}</td>
+                                        <td>{{ $value['time'] }}</td>
+                                        <td>{{ $value['place'] }}</td>
+                                        <td><a href="{{ $value['maps'] }}" target="_blank">Link Maps</a></td>
                                         {{-- <th>{{ $value['created_at'] }}</th> --}}
                                     </tr>
                                     @endforeach

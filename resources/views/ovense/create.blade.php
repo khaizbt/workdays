@@ -3,9 +3,7 @@
 @section('title')
 Create Offense
 @endsection
-@section('style')
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-@endsection
+@section('ovense', 'active')
 @section('content')
 <section class="section">
     <div class="section-header">
