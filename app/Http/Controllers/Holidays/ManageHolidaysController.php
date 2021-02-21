@@ -245,7 +245,7 @@ class ManageHolidaysController extends Controller
         if($request->ajax()) {
             $data = Holiday::whereHas("employee", function($q){
                 $q->where("company_id", session("company_id"));
-            })->with("employee")->get();
+            })->where('is_approved','!=', 2)->with("employee")->get();
             return Datatables::of($data)
             ->addColumn('action', function ($data) {
                 return "<a href='".route('leave.edit', [Crypt::encrypt($data['id'])])."'><i class='fa fa-edit text-info'></i></a>
