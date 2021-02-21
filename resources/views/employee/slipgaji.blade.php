@@ -20,13 +20,17 @@
 <body>
     <table width="100%" style="font-family:Arial, Helvetica, sans-serif; font-size:0.85em; border-bottom:1px solid black">
         <tr>
-            <td width="25" align="center"><img src="{{ asset('assets/img/stisla-fill.png') }}" alt="logo" width="100"></td>
+            <td width="25" align="center"><img src="{{storage_path('app/'.$employee['company']['logo'])}}" alt="logo" width="100"></td>
             <td width="50" align="center">
                 <h1>{{ $employee['company']['name'] }}</h1>
                 <p>{{ $employee['company']['address'] }}</p>
                 <p>{{ $employee['company']['email'] ." | ". $employee['company']['phone'] }}</p>
             </td>
-            <td width="25" align="center"><div style="visibility: hidden"><img src="{{ asset('assets/img/stisla-fill.png') }}" alt="logo" width="100"></div></td>
+            <td width="25" align="center">
+                <div style="visibility: hidden">
+                    <img src="{{storage_path('app/'.$employee['company']['logo'])}}" alt="logo" width="100">
+                </div>
+            </td>
         </tr>
     </table>
 <br>
