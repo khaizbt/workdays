@@ -26,11 +26,12 @@ Create Offense
                         <div class="card-header"><h4>Add a New Offense</h4></div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="title">Offense Name</label>
+                                <label for="title">Offense Name <span class="required" aria-required="true"> * </span></label>
                                 <input type="text" class="form-control" name="ovense_name">
                             </div>
                             <div class="form-group">
-                                <label for="title">Employee</label>
+                                <label for="title">Employee <span class="required" aria-required="true"> * </span></label>
+
                                 <select name="employee" id="select2" class="form-control">
                                     <option value="">Choose Employee</option>
                                     @foreach($employee as $key => $value)
@@ -39,7 +40,7 @@ Create Offense
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="title">Pinalty Type</label>
+                                <label for="title">Pinalty Type <span class="required" aria-required="true"> * </span></label>
                                 <select name="pinalty_type" class="form-control">
                                     <option value="">Chossee Type</option>
                                     <option value="Sanksi Lisan">Teguran</option>
@@ -52,10 +53,10 @@ Create Offense
                             </div>
                             <div class="form-group" id="punishment">
                                 <label for="title">Punishment</label>
-                                <input type="text" class="form-control input_mask_currency" name="punishment">
+                                <input type="text" class="form-control input_mask_currency" placeholder="Punishment (Leave blank if not give punishment )" name="punishment">
                             </div>
                             <div class="form-group">
-                                <label for="">Date</label>
+                                <label for="">Date <span class="required" aria-required="true"> * </span></label>
                                 <input type="date" name="date"  class="form-control">
 
                             </div>

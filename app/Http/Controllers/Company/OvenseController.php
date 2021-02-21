@@ -117,10 +117,10 @@ class OvenseController extends Controller
             ]);
 
             DB::commit();
-            return "sukses";
+            return redirect("/ovense")->withSuccess(['Ovense has been updated']);
         } catch (\Throwable $th) {
             DB::rollback();
-            return "fail";
+            return redirect("/ovense")->withErrors(['Update Ovense Failed, Please Try again later #RER142']);
         }
     }
 

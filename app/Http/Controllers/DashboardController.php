@@ -33,6 +33,8 @@ class DashboardController extends Controller
         $data;
         if($user['level'] == 2) {
             $company = Company::where('id_user', $user['id'])->first();
+
+            // return $company;
             if($company){
                 session(["company_id" => $company['id']]);
                 $data['count_working'] = self::countWorking();
@@ -56,6 +58,8 @@ class DashboardController extends Controller
             $data['ovense'] = self::ovense();
             $data['gajian'] = date('l, d F Y', strtotime(date('Y-m-'.$company['date_salary'])));
         }
+
+        // return session()->all();
 
         return view('admin.dashboard.index', compact('data'));
     }
