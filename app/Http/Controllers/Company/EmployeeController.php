@@ -15,6 +15,9 @@ use Auth;
 use Hash;
 use DB;
 use Validator;
+// use Rule;
+use Illuminate\Validation\Rule;
+
 class EmployeeController extends Controller
 {
     public function index() {
@@ -25,7 +28,7 @@ class EmployeeController extends Controller
 
     public function data(Request $request) {
 
-        if($request->ajax()) {
+        // if($request->ajax()) {
             $data = Employee::where('company_id', session('company_id'))->get();
             return Datatables::of($data)
                 ->addColumn('action', function ($data) {
@@ -37,9 +40,9 @@ class EmployeeController extends Controller
             ->addIndexColumn()
                 ->rawColumns(['action'])
                 ->make(true);
-        } else {
-            return "Request Not Allowed";
-        }
+        // } else {
+        //     return "Request Not Allowed";
+        // }
     }
 
     public function create() {
@@ -48,9 +51,21 @@ class EmployeeController extends Controller
 
     public function store(Request $request) {
         $post = $request->except("_token");
+        $validator = Validator::make($post, [
+            'name' => 'required',
+            'position' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required',
+            'salary' =>'required'
+        ]);
 
+        if ($validator->fails()) {
+            return redirect('employee/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
         DB::beginTransaction();
-        try {
+        // try {
             //Validasi Email
             $post['salary'] = str_replace(['Rp', " ", "."], "", $post['salary']);
             $user = User::where('email', $post['email'])->first();
@@ -64,32 +79,31 @@ class EmployeeController extends Controller
             ]);
 
             $save->assignRole("User");
-            $company = Company::where("id_user",2)->first();
+
             if($save) {
-                $employee = Employee::create([
+                Employee::create([
                     "name" => $post['name'],
                     'position' => $post['position'],
-                    "status" => $post['status'],
                     "salary" => $post['salary'],
-                    "company_id" => $company['id'],
+                    "company_id" => session('company_id'),
                     "user_id" => $save['id'],
                 ]);
 
             }
             DB::commit();
-            return redirect('/employee')->with(['success' => 'Employee has been created']);
+            return redirect('/employee')->withSuccess(['Employee has been created']);
 
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return redirect('/employee')->with(['error' => 'Create Employee Failed']);
-        }
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return redirect('/employee')->withErrors(['Create Employee Failed']);
+        // }
     }
 
     public function edit($id) {
         $employee = Employee::where('id', $id)->first();
         $validate = MyHelper::validationEmployee($id, session("company_id"));
         if($validate == false) {
-            return redirect('/employee')->with(['error' => 'Something went wrong, please try again']);
+            return redirect('/employee')->withErrors(['Something went wrong, please try again']);
         }
         $user = User::where('id', $employee['user_id'])->first();
 
@@ -98,20 +112,33 @@ class EmployeeController extends Controller
 
     public function update(Request $request, $id) {
         $post = $request->except("_token", 'user_id');
+        $validator = Validator::make($post, [
+            'name' => 'required',
+            'position' => 'required',
+            // 'email' => 'required|email|unique:users,email',
+            // 'email' => ['required', Rule::unique('users')->ignore($id)],
+            'salary' =>'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('employee')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
         $validate = MyHelper::validationEmployee($id, session("company_id"));
         if($validate == false) {
             return redirect('/employee')->with(['error' => 'Something went wrong, please try again']);
         }
 
         DB::beginTransaction();
-        try {
+        // try {
 
             $employee = Employee::where('id', $id)->first();
             $post['salary'] = str_replace(['Rp', " ", "."], "", $post['salary']);
             $update = $employee->update([
                 "name" => $post['name'],
                 "position" => $post['position'],
-                "status" => $post['status'],
+                // "status" => $post['status'],
                 "salary" => $post['salary']
             ]);
 
@@ -124,11 +151,11 @@ class EmployeeController extends Controller
             }
 
             DB::commit();
-            return redirect('/company')->with(['success' => 'Employee has been updated']);
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return redirect('/company')->with(['error' => 'Update Employee Failed']);
-        }
+            return redirect('/employee')->withSuccess(['Employee has been updated']);
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return redirect('/employee')->withErrors(['Update Employee Failed']);
+        // }
     }
 
     public function delete($id) {

@@ -24,25 +24,25 @@ Create Emplotee
                         <div class="card-header"><h4>Add a New Employee</h4></div>
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="title">Name</label>
-                                <input type="text" class="form-control" name="name" required>
+                                <label for="title">Name <span class="required" aria-required="true"> * </span></label>
+                                <input type="text" placeholder="Employee Name" class="form-control" name="name" required>
                             </div>
                             <div class="form-group">
-                                <label for="title">Position</label>
-                                <input type="text" class="form-control" name="position" required>
+                                <label for="title">Position <span class="required" aria-required="true"> * </span></label>
+                                <input type="text" placeholder="Employee Position" class="form-control" name="position" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="title">Email</label>
-                                <input type="email" class="form-control" name="email">
+                                <label for="title">Email <span class="required" aria-required="true"> * </span></label>
+                                <input type="email" placeholder="Employee Email"  class="form-control" name="email">
                             </div>
                             <div class="form-group">
-                                <label for="title">Password</label>
-                                <input type="password" class="form-control" name="password">
+                                <label for="title">Password <span class="required" aria-required="true"> * </span></label>
+                                <input type="password" placeholder="Employee Password" class="form-control" name="password">
                             </div>
                             <div class="form-group">
-                                <label for="title">Salary</label>
-                                <input type="text" class="form-control input_mask_currency" name="salary">
+                                <label for="title">Salary <span class="required" aria-required="true"> * </span></label>
+                                <input type="text" placeholder="Employee Salary" class="form-control input_mask_currency" name="salary">
                             </div>
                         </div>
                             <div class="card-footer">

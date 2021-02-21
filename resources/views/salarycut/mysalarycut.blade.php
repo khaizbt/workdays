@@ -59,13 +59,13 @@ My Salary Cut
                                 <tbody>
                                     @foreach($data['salary_cut'] as $key => $value)
                                     <tr>
-                                        <th>{{ $key+1 }}</th>
-                                        <th>{{ $value['cuts_name'] }}</th>
-                                        <th>{{ $value['notes'] }}</th>
-                                        <th><img width="100px" src="{{ route("get.file", str_replace("/", "+", $value['image'])) }}" alt=""> </th>
-                                        <th>Rp.{{ number_format($value['value']) }}</th>
-                                        <th>{{ ($value['status'] == 1) ? "Dipotong Perbulan" : "Dipotong 1x" }}</th>
-                                        <th>{{ $value['created_at'] }}</th>
+                                        <td>{{ $key+1 }}</td>
+                                        <td>{{ $value['cuts_name'] }}</td>
+                                        <td>{{ $value['notes'] }}</td>
+                                        <td><img width="100px" src="{{ route("get.file", str_replace("/", "+", $value['image'])) }}" alt=""> </td>
+                                        <td>Rp.{{ number_format($value['value']) }}</td>
+                                        <td>{{ ($value['status'] == 1) ? "Dipotong Perbulan" : "Dipotong 1x" }}</td>
+                                        <td>{{ $value['created_at'] }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>

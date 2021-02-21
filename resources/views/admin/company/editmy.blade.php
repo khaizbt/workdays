@@ -7,7 +7,7 @@ Dashboard
 @section('content')
 <section class="section">
   <div class="section-header">
-    <h1>Edit Companies</h1>
+    <h1>Companies</h1>
     <div class="section-header-breadcrumb">
         <div class="breadcrumb-item active"><a href="{{ route('company.index') }}">Companies</a></div>
         <div class="breadcrumb-item">Edit Companies</div>

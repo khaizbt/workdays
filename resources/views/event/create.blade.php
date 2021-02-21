@@ -13,6 +13,7 @@ Create Event
             <div class="breadcrumb-item">Create Event</div>
         </div>
     </div>
+    @include('notification')
     <div class="section-body">
         <div class="row">
             <div class="col-md-8 col-sm-12">
@@ -23,19 +24,23 @@ Create Event
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Event Name</label>
-                                <input type="text" class="form-control" name="event_name" required>
+                                <input type="text" class="form-control" placeholder="Event Name" name="event_name" required>
                             </div>
                             <div class="form-group">
                                 <label for="notes">Notes</label>
-                                <textarea name="note" id="" class="form-control" cols="30" rows="50" required></textarea>
+                                <textarea name="note" id="" placeholder="Event Notes" class="form-control" cols="30" rows="50" required></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="title">Date And Time</label>
                                 <input type="datetime-local" class="form-control" name="time" id="" required>
                             </div>
                             <div class="form-group">
-                                <label for="value">Value</label>
-                                <input type="text"  class="form-control"name="place" id="" required>
+                                <label for="value">Place</label>
+                                <input type="text" placeholder="Place Event" class="form-control"name="place" id="" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="value">Place</label>
+                                <input type="text" placeholder="Link Maps Place Events"  class="form-control" name="maps">
                             </div>
                         </div>
                             <div class="card-footer">
@@ -51,18 +56,7 @@ Create Event
 </section>
 @endsection
 @section('scripts')
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-<script>
-    $( function() {
-    $( "#date_range" ).daterangepicker({
-        "minDate": moment(),
-        "maxSpan": {
-        "days": 2
-    },
-}, function(start, end, label) {
-  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
-});
-    });
-  </script>
+
+
 {{-- <script src="{{ asset("assets/js/page/datepicker.js") }}"></script> --}}
 @endsection

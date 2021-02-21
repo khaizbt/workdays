@@ -150,16 +150,16 @@ Offense
                                     text: 'Something went wrong!'
                                 }).then((result) => {
                                         if (result.value) {
-                                            $(location).attr('href', "{{route('leave.index')}}");
+                                            $(location).attr('href', "{{route('ovense.index')}}");
                                         }
                                     });
                             }
                             if (response == 1) {
                                     swal("Success!", "Data has been deleted!", "success").then((result) => {
                                         if (result.value) {
-                                            $(location).attr('href', "{{route('leave.index')}}");
+                                            $(location).attr('href', "{{route('ovense.index')}}");
                                         }
-                                    $(location).attr('href', "{{route('leave.index')}}");
+                                    $(location).attr('href', "{{route('ovense.index')}}");
                                 });
                             }
                         },

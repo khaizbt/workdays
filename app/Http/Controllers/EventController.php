@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Crypt;
 use App\Notifications\EventSubmit;
 use DataTables;
 use DB;
+use Validator;
+use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
@@ -25,9 +27,11 @@ class EventController extends Controller
         ->addColumn('action', function ($data) {
             return "<a href='".route('event.edit', [Crypt::encrypt($data['id'])])."'><i class='fa fa-edit text-info'></i></a>
             | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+    })->addColumn('link', function($row){
+        return  ($row['maps'] != null) ? "<a href='".$row['maps']."' target='_blank'>Link Maps</a>" :'-';
     })
     ->addIndexColumn()
-        ->rawColumns(['action'])
+        ->rawColumns(['action', 'link'])
         ->make(true);
     }
 
@@ -38,7 +42,19 @@ class EventController extends Controller
     public function store(Request $request) {
         $post = $request->except("_token");
         $post['company_id'] = session("company_id");
+        $validator = Validator::make($post, [
+            'event_name' => 'required|max:100',
+            // 'notes' => 'required|min:10',
+            'note' => 'required',
+            'time' => 'required',
+            'place' =>'required',
 
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('salary-cut')
+                        ->withErrors($validator);
+        }
         // return $post;
         DB::beginTransaction();
         try {
@@ -59,11 +75,11 @@ class EventController extends Controller
 //TODO Icon, Cek Typo Header dan Cek Redirect if Success or Error
 
             DB::commit();
-            return redirect('/event')->with(['success' => 'Events has been created']);
+            return redirect('/event')->withSuccess(['Events has been created']);
 
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect('/event')->with(['error' => 'Create Events failed']);
+            return redirect('/event')->withErrors(['Create Events failed']);
 
         }
     }
@@ -83,22 +99,24 @@ class EventController extends Controller
                 "note" => $post['note'],
                 "event_name" => $post['event_name'],
                 "time" => $post['time'],
-                "place" => $post['place']
+                "place" => $post['place'],
+                "maps" => $post['maps']
             ]);
 
             DB::commit();
-        return redirect('/event')->with(['success' => 'Event has been updated']);
+        return redirect('/event')->withSuccess(['Event has been updated']);
 
 
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect('/event')->with(['error' => 'Update Events failed']);
+            return redirect('/event')->withErrors(['Update Events failed']);
 
         }
     }
 
-    public function delete($id){
-        return Event::where("id", $id)->where("company_id", session("company_id"))->delete();
+    public function delete(Request $request, $id){
+        if($request->ajax())
+            return Event::where("id", $id)->where("company_id", session("company_id"))->delete();
     }
 
     public function myEvent() {

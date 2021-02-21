@@ -54,21 +54,21 @@ Detail Salary
                                         </tr>
                                         <tr>
                                             <td>Salary</td>
-                                            <td>:  Rp.{{ $employee['salary'] }}</td>
+                                            <td>:  Rp.{{ number_format($employee['salary']) }}</td>
                                         </tr>
                                         <tr>
                                             <td>Punishment</td>
-                                            <td>: Rp.{{ $employee['punishment_total'] ?? '0' }}</td>
+                                            <td>: Rp.{{ number_format($employee['punishment_total']) ?? '0' }}</td>
                                         </tr>
                                         <tr><td>Holiday Paid</td>
-                                        <td>: Rp.{{ $employee['holiday_paid_total'] ?? '0' }}</td></tr>
+                                        <td>: Rp.{{ number_format($employee['holiday_paid_total']) ?? '0' }}</td></tr>
                                         <tr>
                                             <td>Salary Cut </td>
-                                            <td>: Rp. {{ $employee['salary_cut_total'] ?? '0' }}</td>
+                                            <td>: Rp. {{ number_format($employee['salary_cut_total']) ?? '0' }}</td>
                                         </tr>
                                         <tr>
                                             <td>Fix Salary</td>
-                                            <td>: Rp.{{ $employee['salary_fix'] ?? '0' }}</td>
+                                            <td>: Rp.{{ number_format($employee['salary_fix']) ?? '0' }}</td>
                                         </tr>
 
                                     </tbody>

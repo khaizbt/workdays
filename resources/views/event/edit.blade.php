@@ -3,6 +3,7 @@
 @section('title')
 Edit Event
 @endsection
+@section('event', 'active')
 @section('content')
 <section class="section">
     <div class="section-header">
@@ -33,8 +34,12 @@ Edit Event
                                 <input type="datetime-local" class="form-control" value="{{ date('Y-m-d\TH:i', strtotime($data['time']))  }}" name="time" required id="">
                             </div>
                             <div class="form-group">
-                                <label for="value">Value</label>
+                                <label for="value">Place</label>
                                 <input type="text" value="{{ $data['place'] }}"  class="form-control"name="place" id="">
+                            </div>
+                            <div class="form-group">
+                                <label for="value">Link Maps</label>
+                                <input type="text" placeholder="Link Maps Place Events" value="{{ $data['maps'] }}"  class="form-control" name="maps">
                             </div>
                         </div>
                             <div class="card-footer">

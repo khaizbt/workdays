@@ -13,6 +13,8 @@ use App\Models\WorkDay;
 use App\Helpers\MyHelper;
 use App\Notifications\SubmitLeave;
 use Illuminate\Support\Facades\Crypt;
+use Validator;
+use Illuminate\Validation\Rule;
 
 class ManageCompanyController extends Controller
 {
@@ -46,62 +48,74 @@ class ManageCompanyController extends Controller
         $id_user = array_column($user_data, 'id');
 
         $user = User::where('level', 2)->get();
-
-        // return $user;
         return view('admin.company.create')->with('user', $user);
     }
 
     public function store(Request $request){
-        $request->validate([
-            'name' => 'required|unique:companies',
-            'logo'  => 'required'
-            // 'id_user' => 'required|unique:table,column,except,id'
-
-        ]);
         $post = $request->all();
-        // return $post;
         $post['id_user'] = Crypt::decrypt($post['id_user']);
 
-        $user = User::where('id', $post['id_user'])->first();
-         $user->assignRole("Admin");
+        $validator = Validator::make($post, [
+            'name' => 'required|unique:companies',
+            'address' => 'required|min:10',
+            'email' => 'required|email',
+            'phone' => 'required',
+            'id_user' =>'required|unique:companies',
+            'date_salary' => 'required',
+            'number_leave' => 'required',
+            'maximum_leave' => 'required'
+        ]);
 
-
-
-        DB::beginTransaction();
-        if($post['logo']) {
-            $upload = MyHelper::uploadFile($post['logo'], "company/logo/");
-
-            if($upload['status'] == "fail")
-                return redirect()->back()->withInput();
-
-                $post['logo'] = $upload['path'];
+        if ($validator->fails()) {
+            return redirect('company/create')
+                        ->withErrors($validator)
+                        ->withInput();
         }
 
-        if(isset($post['work_holiday']) && $post['work_holiday'] == "on")
-            $post['work_holiday'] = 1;
-        $check_user = Company::where("id_user", $post['id_user'])->first();
-        if($check_user){
-            return redirect('/company')->with(['error' => 'User has been asigned to other company']);
-        }
-        $company = Company::create($post);
+        // try {
+            $user = User::where('id', $post['id_user'])->where('level', 2)->first();
+            $user->assignRole("Admin");
 
-        // foreach($post['value'] as $k => $v) {
-        //     $work_days = WorkDay::create([
-        //         'id_company' => $company['id'],
-        //         'days' => $v
-        //     ]);
+
+
+            DB::beginTransaction();
+            if(isset($post['logo']) && $post['logo'] != null) {
+                $upload = MyHelper::uploadFile($post['logo'], "company/logo/");
+
+                if($upload['status'] == "fail")
+                    return redirect()->back()->withInput();
+
+                    $post['logo'] = $upload['path'];
+            }
+
+            if(isset($post['work_holiday']) && $post['work_holiday'] == "on")
+                $post['work_holiday'] = 1;
+
+            // return $post;
+
+            $company = Company::create($post);
+
+            // foreach($post['value'] as $k => $v) {
+            //     $work_days = WorkDay::create([
+            //         'id_company' => $company['id'],
+            //         'days' => $v
+            //     ]);
+            // }
+
+            // $user = User::where("id")
+            // $user = User::find($value['id_customer_analyst']);
+            $notification = [
+                'message' => "Company Has Been Created",
+                'url' => 'company/edit-company',
+                'action_status' => 'Pra Penilaian'
+            ];
+            $company->user->notify(new SubmitLeave($notification));
+            DB::commit();
+            return redirect('/company')->withSuccess(['Data Company has been created']);
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return redirect()->back()->withErrors(['Create Company Failed'])->withInput();
         // }
-
-        // $user = User::where("id")
-        // $user = User::find($value['id_customer_analyst']);
-        $notification = [
-            'message' => "Company Has Been Craeted",
-            'url' => 'company/edit-company',
-            'action_status' => 'Pra Penilaian'
-        ];
-        $company->user->notify(new SubmitLeave($notification));
-        DB::commit();
-        return redirect('/company')->with(['success' => 'Data Company has been created']);
     }
 
     public function edit($id){
@@ -114,6 +128,24 @@ class ManageCompanyController extends Controller
     public function update(Request $request, $id){
         $post = $request->except('id', "_token");
         $post['id_user'] = Crypt::decrypt($post['id_user']);
+        $validator = Validator::make($post, [
+            'name' => ['required', Rule::unique('companies')->ignore($id)],
+            'address' => 'required|min:10',
+            'email' => 'required|email',
+            'phone' => 'required',
+            'id_user' =>['required', Rule::unique('companies')->ignore($id)],
+            'date_salary' => 'required',
+            'number_leave' => 'required',
+            'maximum_leave' => 'required'
+        ]);
+
+
+        if ($validator->fails()) {
+            return redirect('company')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+
         if(isset($post['work_holiday']) && $post['work_holiday'] == "on")
         $post['work_holiday'] = 1;
 
@@ -127,19 +159,18 @@ class ManageCompanyController extends Controller
         }
         DB::beginTransaction();
         $delete = WorkDay::where("id_company", $id)->delete();
-        foreach($post['value'] as $k => $v) {
-            $work_days = WorkDay::create([
-                'id_company' => $id,
-                'days' => $v
-            ]);
-        }
-
+        // foreach($post['value'] as $k => $v) {
+        //     $work_days = WorkDay::create([
+        //         'id_company' => $id,
+        //         'days' => $v
+        //     ]);
+        // }
 
         unset($post['value']);
         $update = Company::where('id', $id)
             ->update($post);
             DB::commit();
-        return redirect('/company')->with(['success' => 'Data Company has been updated']);
+        return redirect('/company')->withSuccess(['Company has been updated']);
 
     }
 

@@ -11,7 +11,8 @@ class Event extends Model
         "note",
         "event_name",
         "time",
-        "place"
+        "place",
+        "maps"
     ];
 
     public function company(){

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
+use App\Notifications\SalaryCuts as NotifCuts;
 use Illuminate\Http\Request;
 use App\Helpers\MyHelper;
 use App\Models\SalaryCuts;
@@ -11,6 +12,8 @@ use App\Models\Employee;
 use DataTables;
 use Auth;
 use DB;
+use Validator;
+use Illuminate\Validation\Rule;
 
 class SalaryCutController extends Controller
 {
@@ -54,35 +57,55 @@ class SalaryCutController extends Controller
     public function store(Request $request) {
         $post = $request->all();
         DB::beginTransaction();
+        $validator = Validator::make($post, [
+            'cuts_name' => 'required|max:100',
+            // 'notes' => 'required|min:10',
+            'value' => 'required',
+            'employee' => 'required',
+            'status' =>'required',
 
-        try {
-            $post['employee_id'] = Crypt::decryptString($post['employee_id']);
+        ]);
 
-        if(isset($post['image']) && $post['image'] != null) {
-            $upload = MyHelper::uploadFile($post['image'], "company/salary-cut/");
-
-            if($upload['status'] == "fail")
-                return redirect()->back()->withInput();
-
-                $post['image'] = $upload['path'];
+        if ($validator->fails()) {
+            return redirect('salary-cut')
+                        ->withErrors($validator);
         }
 
-        $salary_cuts = SalaryCuts::create($post);
+        // try {
+            $post['employee_id'] = Crypt::decryptString($post['employee']);
+            $post['value'] = str_replace(['Rp', ',', '.', " "],"", $post['value']);
 
-        if($salary_cuts && $post['status'] == 1){
-            $employee = Employee::where("id", $post['employee_id'])->first();
+            if(isset($post['image']) && $post['image'] != null) {
+                $upload = MyHelper::uploadFile($post['image'], "company/salary-cut/");
 
-            $employee = $employee->update([
-                "salary" => $employee['salary'] - $post['value'] //Ketika Update tinggal sesuaikan, Jumlah sekarang lbh besar maka dikurangi, jika lbh kecil maka ditambah sisa
-            ]);
-        }
+                if($upload['status'] == "fail")
+                    return redirect()->back()->withInput();
 
-        DB::commit();
-        return redirect('/salary-cut')->with(['success' => 'Salary Cut has been created']);
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return redirect('/salary-cut')->with(['error' => 'Create Salary Cut Failed']);
-        }
+                    $post['image'] = $upload['path'];
+            }
+
+            $salary_cuts = SalaryCuts::create($post);
+            $message = "You has been assigned Salary cut = ".$post['cuts_name'].", You Charge = ".$post['value'];
+            if($salary_cuts && $post['status'] == 1){
+                $employee = Employee::where("id", $post['employee_id'])->first();
+
+                $employee = $employee->update([
+                    "salary" => $employee['salary'] - $post['value'] //Ketika Update tinggal sesuaikan, Jumlah sekarang lbh besar maka dikurangi, jika lbh kecil maka ditambah sisa
+                ]);
+            }
+            $notification = [
+                'message' => $message,
+                'url' => 'ovense/my-ovense',
+                'action_status' => 'Pra Penilaian'
+            ];
+            $salary_cuts->employee->user->notify(new NotifCuts($notification));
+
+            DB::commit();
+            return redirect('/salary-cut')->withSuccess(['Salary Cut has been created']);
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return redirect('/salary-cut')->withErrors(['Create Salary Cut Failed']);
+        // }
     }
 
     public function edit($id) {
@@ -95,10 +118,23 @@ class SalaryCutController extends Controller
 
     public function update(Request $request, $id) {
         $post = $request->except("id","_token");
+        $validator = Validator::make($post, [
+            'cuts_name' => 'required|max:100',
+            // 'notes' => 'required|min:10',
+            'value' => 'required',
+            'employee' => 'required',
+            'status' =>'required',
 
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('salary-cut/create')
+                        ->withErrors($validator);
+        }
         DB::beginTransaction();
-        try {
+        // try {
             $data = SalaryCuts::where("id", Crypt::decrypt($id))->first();
+            $post['value'] = str_replace(['Rp', ',', '.', " "],"", $post['value']);
 
             if($data['status'] == 1 && $post['value'] != $data['value']){
                 $employee = Employee::where("id", Crypt::decrypt($post['employee_id']))->first();
@@ -120,7 +156,7 @@ class SalaryCutController extends Controller
             "notes" => $post['notes'],
             "value" => $post['value'],
             "status" => $post['status'],
-            "employee_id" => Crypt::decrypt($post['employee_id'])
+            "employee_id" => Crypt::decrypt($post['employee'])
         ]);
 
         if(isset($post['image']) && $post['image'] != null) {
@@ -135,24 +171,34 @@ class SalaryCutController extends Controller
             ]);
         }
         DB::commit();
-        return redirect('/salary-cut')->with(['success' => 'Salary Cut has been updated']);
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return redirect('/salary-cut')->with(['error' => 'Update Salary Cut failed']);
-        }
+        return redirect('/salary-cut')->withSuccess(['Salary Cut has been updated']);
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return redirect('/salary-cut')->withErrors(['Update Salary Cut failed']);
+        // }
     }
 
 
     public function delete($id) {
         $data = SalaryCuts::where("id", $id)->first();
-
+        DB::beginTransaction();
         if($data['status'] == 1){
             $employee = Employee::where("id", $data['employee_id'])->first();
             $employee->update([
                 "salary" => $employee['salary'] + $data['value'],
             ]);
         }
-        return $data->delete();
+
+
+        $data  = $data->delete();
+        if($data) {
+            DB::commit();
+            return 1;
+        }
+
+        DB::rollback();
+        return 0;
+
     }
 
     public function mySalaryCut() {

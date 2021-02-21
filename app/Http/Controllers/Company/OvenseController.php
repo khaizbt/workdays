@@ -50,7 +50,7 @@ class OvenseController extends Controller
     public function store(Request $request) {
         $post = $request->except("_token");
         $validator = Validator::make($request->all(), [
-            'name' => 'required|max:255',
+            'ovense_name' => 'required|max:255',
             'date' => 'required',
             'employee' => 'required'
         ]);
@@ -95,10 +95,12 @@ class OvenseController extends Controller
         $post = $request->except('_token', 'id');
         $post['id'] = Crypt::decrypt($id);
         $validator = Validator::make($post, [
-            'name' => 'required|max:255',
+            'ovense_name' => 'required|max:255',
             'date' => 'required',
             'employee' => 'required'
         ]);
+
+        $post['punishment'] = str_replace(["Rp", " ", ".",","], "", $post['punishment']);
 
         if ($validator->fails()) {
             return redirect('ovense/create')
@@ -117,10 +119,10 @@ class OvenseController extends Controller
             ]);
 
             DB::commit();
-            return "sukses";
+            return redirect("/ovense")->withSuccess(['Ovense has been updated']);
         } catch (\Throwable $th) {
             DB::rollback();
-            return "fail";
+            return redirect("/ovense")->withErrors(['Update Ovense Failed, Please Try again later #RER142']);
         }
     }
 

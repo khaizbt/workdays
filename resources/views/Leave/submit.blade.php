@@ -7,10 +7,10 @@ Submit Leave
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Submit Leave</h1>
+        <h1>Leave</h1>
         <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Leave</a></div>
-            <div class="breadcrumb-item">Create </div>
+            <div class="breadcrumb-item active"><a href="{{ route('leave.my') }}">Leave</a></div>
+            <div class="breadcrumb-item">Submit </div>
         </div>
     </div>
     <div class="section-body">
@@ -23,7 +23,7 @@ Submit Leave
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Leave Name</label>
-                                <input type="text" class="form-control" name="leave_name">
+                                <input type="text" placeholder="Leave Name" class="form-control" name="leave_name">
                             </div>
 
                             <div class="form-group">
@@ -38,11 +38,13 @@ Submit Leave
 
                             <div class="form-group">
                                 <label for="">Date</label>
-                                <input type="date" name="date_start"  class="form-control">
+                                <div class="input-group">                                <input type="date" name="date_start"  class="form-control">
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="la la-ellipsis-h"></i>To</span>
                                 </div>
                                 <input type="date" class="form-control" name="date_end">
+                            </div>
+
                             </div>
                         </div>
                             <div class="card-footer">
@@ -58,18 +60,5 @@ Submit Leave
 </section>
 @endsection
 @section('scripts')
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-<script>
-    $( function() {
-    $( "#date_range" ).daterangepicker({
-        "minDate": moment(),
-        "maxSpan": {
-        "days": 2
-    },
-}, function(start, end, label) {
-  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
-});
-    });
-  </script>
 {{-- <script src="{{ asset("assets/js/page/datepicker.js") }}"></script> --}}
 @endsection

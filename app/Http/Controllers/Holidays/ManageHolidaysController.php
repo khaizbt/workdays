@@ -10,6 +10,8 @@ use DB;
 use DateInterval;
 use DataTables;
 use PDF;
+use Validator;
+use Illuminate\Validation\Rule;
 use App\Models\Employee;
 use App\Models\Holiday;
 use App\Models\Company;
@@ -110,7 +112,7 @@ class ManageHolidaysController extends Controller
             $val_ovense['deskripsi'] = $val_ovense['employee']['name'];
             // $offense[$row] =
                 $val_ovense['color'] = 'red';
-            // return $val_ovense;
+                $val_ovense['url'] =  (Auth::user()->hasRole('Admin')) ? 'ovense' : 'ovense/my-ovense';;
             $offense[date('YmdHi', strtotime($val_ovense['created_at']))] = $val_ovense;
 
         }
@@ -271,6 +273,22 @@ class ManageHolidaysController extends Controller
 
     public function storeLeave(Request $request) {
         $post = $request->except("_token");
+
+        $validator = Validator::make($request->all(), [
+            'leave_name' => 'required|max:255',
+            'employee' => 'required',
+            'date_start'    => 'required',
+            'date_end' => 'required',
+            'employee' => 'required',
+            'is_approved' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('leave/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+
         $begin = new DateTime($post['date_start']);
         $end = new DateTime($post['date_end']);
         $end = $end->modify( '+1 day' );
@@ -295,14 +313,18 @@ class ManageHolidaysController extends Controller
         $company = Company::where('id_user', Auth::id())->first();
 
         if($numberDays > $company['maximum_leave']){
-            return redirect("/leave")->with("error", "maximum leave is ".$company['maximum_leave'])." days";
+            return redirect("/leave")->withErrors(["maximum leave is ".$company['maximum_leave']." days"]);
         }
 
         DB::beginTransaction();
-        // try {
+        try {
             $post['employee_id'] = Crypt::decryptString($post['employee']);
+            $post['charge'] = str_replace(["Rp", " ", ".",","], "", $post['charge']);
+            if($post['charge'] == "")
+                $post['charge'] = 0;
+            // return $post;
             $save = Holiday::create($post);
-            // return $save;
+
             if($save){
                 foreach($period as $k => $v) {
                     $save_date = LeaveDate::create([
@@ -319,11 +341,11 @@ class ManageHolidaysController extends Controller
             ];
             $save->employee->user->notify(new AssignLeave($notification));
             DB::commit();
-            return redirect("/leave")->with("success", "Leave has been assigned");
-        // } catch (\Throwable $th) {
-        //     DB::rollback();
-        //     return redirect("/leave")->with("error", "Assign Leave Failed #RT438");
-        // }
+            return redirect("/leave")->withSuccess(["Leave has been assigned"]);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect("/leave")->withErrors(["Assign Leave Failed #RT438"]);
+        }
 
     }
 
@@ -335,7 +357,21 @@ class ManageHolidaysController extends Controller
 
     public function updateLeave(Request $request, $id){
         $post = $request->except("_token", 'employee_id');
-        // return $post;
+        $validator = Validator::make($request->all(), [
+            'leave_name' => 'required|max:255',
+            'employee' => 'required',
+            'date_start'    => 'required',
+            'date_end' => 'required',
+            'employee' => 'required',
+            'is_approved' => 'required',
+            "status" => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('leave/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
         DB::beginTransaction();
         try {
             $begin = new DateTime($post['date_start']);
@@ -360,7 +396,7 @@ class ManageHolidaysController extends Controller
             $company = Company::where('id_user', Auth::id())->first();
 
             if($numberDays > $company['maximum_leave']){
-                return redirect("/leave")->with("error", "maximum leave is ".$company['maximum_leave'])." days";
+                return redirect("/leave")->withErrors(["maximum leave is ".$company['maximum_leave']." days"]);
             }
             // return $post;
             $id = Crypt::decryptString($id);
@@ -387,10 +423,10 @@ class ManageHolidaysController extends Controller
 
             DB::commit();
 
-            return redirect("/leave")->with("success", "Leave has been updated");
+            return redirect("/leave")->withSuccess(["Leave has been updated"]);
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect("/leave")->with("error", "Update Leave Failed #RT435");
+            return redirect("/leave")->withErrors(["Update Leave Failed #RT435"]);
         }
     }
 
@@ -400,7 +436,17 @@ class ManageHolidaysController extends Controller
 
     public function summitLeave(Request $request) {
         $post = $request->except("_token", "charge", "is_approved", "employee_id");
-        $post = $request->except("_token");
+        $validator = Validator::make($request->all(), [
+            'leave_name' => 'required|max:255',
+            'date_start'    => 'required',
+            'date_end' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('leave/create')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
         $begin = new DateTime($post['date_start']);
         $end = new DateTime($post['date_end']);
         $end = $end->modify( '+1 day' );

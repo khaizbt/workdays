@@ -20,11 +20,11 @@ Route::prefix('company')->middleware('auth')->group(function(){
     Route::get('data', 'Company\ManageCompanyController@data')->name('company.data')->middleware(['role:Super']);
     Route::get('create', 'Company\ManageCompanyController@create')->name('company.create')->middleware(['role:Super']);
     Route::post('create', 'Company\ManageCompanyController@store')->name('company.store')->middleware(['role:Super']);
-    Route::get('edit/{id}', 'Company\ManageCompanyController@edit')->name('company.edit')->middleware(['role:Super', 'role:Admin']);
-    Route::post('update/{id}', 'Company\ManageCompanyController@update')->name('company.update')->middleware(['role:Super', 'role:Admin']);
+    Route::get('edit/{id}', 'Company\ManageCompanyController@edit')->name('company.edit')->middleware(['role:Super|Admin']);
+    Route::post('update/{id}', 'Company\ManageCompanyController@update')->name('company.update')->middleware(['role:Super|Admin']);
     Route::delete('delete/{id}', 'Company\ManageCompanyController@destroy')->name('company.destroy')->middleware(['role:Super']);
-    Route::get("edit-company", 'Company\ManageCompanyController@editCompany')->name('edit.company');
-    Route::post("update-company", 'Company\ManageCompanyController@updateCompany')->name('update.company');
+    Route::get("edit-company", 'Company\ManageCompanyController@editCompany')->name('edit.company')->middleware('role:Admin');
+    Route::post("update-company", 'Company\ManageCompanyController@updateCompany')->name('update.company')->middleware("role:Admin");
 });
 
 Route::prefix("employee")->middleware("auth")->group(function(){
@@ -34,7 +34,7 @@ Route::prefix("employee")->middleware("auth")->group(function(){
     Route::get("edit/{id}", "Company\EmployeeController@edit")->name("employee.edit")->middleware(['role:Admin']);
     Route::post("update/{id}", "Company\EmployeeController@update")->name("employee.update")->middleware(['role:Admin']);
     Route::get("salary/data", "Holidays\ManageHolidaysController@countSalaryEmployeeAll")->name('salary.data')->middleware(['role:Admin']);
-    Route::get('salary', "Company\EmployeeController@salary")->name('salary.index');
+    Route::get('salary', "Company\EmployeeController@salary")->name('salary.index')->middleware('role:Admin');
     Route::get("salary/{employee}" , "Holidays\ManageHolidaysController@detailSalary")->name("salary.show")->middleware(['role:Admin|User']);
     Route::get("data", "Company\EmployeeController@data")->name("employee.data")->middleware(['role:Admin']);
     Route::delete("delete/{id}", "Company\EmployeeController@delete")->middleware(['role:Admin']);
@@ -57,7 +57,7 @@ Route::prefix("leave")->middleware("auth")->group(function(){
     Route::get("count-cuti-employee", "Holidays\ManageHolidaysController@countHolidaysEmployee");
     Route::get("my-leave/data", "Holidays\ManageHolidaysController@listMyLeave")->name("myleave.data");
     Route::get("my-leave", "Holidays\ManageHolidaysController@myLeave")->name('leave.my');
-    Route::post("reject/{id}", "Holidays\ManageHolidaysController@reject");
+    Route::post("reject/{id}", "Holidays\ManageHolidaysController@reject")->middleware('role:Admin');
 });
 
 Route::prefix("ovense")->middleware("auth")->group(function(){
@@ -122,17 +122,19 @@ Route::prefix("event")->middleware("auth")->group(function(){
 
 Route::name('admin.')->prefix('admin')->middleware('auth')->group(function() {
     Route::get('dashboard', 'DashboardController')->name('dashboard');
-
+    Route::post('update-user/{id}', 'UserController@updateUser')->name('user.update');
     Route::get('users/roles', 'UserController@roles')->name('users.roles');
     Route::resource('users', 'UserController', [
         'names' => [
             'index' => 'users'
         ]
-    ])->middleware(['permission:manage-users']);
+    ]);
+
 });
 
 Route::middleware('auth')->get('logout', function() {
     Auth::logout();
+    session()->flush();
     return redirect(route('login'))->withInfo('You have successfully logged out!');
 })->name('logout');
 
