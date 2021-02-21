@@ -7,9 +7,9 @@ Update Leave
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Update Leave</h1>
+        <h1>Manage Leave</h1>
         <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Leave</a></div>
+            <div class="breadcrumb-item active"><a href="{{ route('leave.index') }}">Leave</a></div>
             <div class="breadcrumb-item">Update </div>
         </div>
     </div>
@@ -23,7 +23,7 @@ Update Leave
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Leave Name</label>
-                                <input type="text" class="form-control" value="{{ $data['leave_name'] }}" name="leave_name">
+                                <input type="text" placeholder="Leave Name" class="form-control" value="{{ $data['leave_name'] }}" name="leave_name">
                             </div>
                             <div class="form-group">
                                 <label for="title">Employee</label>
@@ -46,7 +46,7 @@ Update Leave
                             </div>
                             <div class="form-group">
                                 <label for="title">Charge</label>
-                                <input type="text" class="form-control input_mask_currency" value="{{ $data['charge'] }}" name="charge">
+                                <input type="text" placeholder="Charge(Leave Blank if not give charge)" class="form-control input_mask_currency" value="{{ $data['charge'] }}" name="charge">
                             </div>
                             <div class="form-group">
                                 <label for="">Date</label>
@@ -96,5 +96,9 @@ $(".input_mask_currency").inputmask({
     digits: 0,
     min: 0
 });
+
+$(document).ready(function(){
+    $('#select2').select2();
+})
 </script>
 @endsection

@@ -4,7 +4,6 @@
 Edit Offense
 @endsection
 @section('style')
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 @endsection
 @section('content')
 <section class="section">
@@ -25,7 +24,7 @@ Edit Offense
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Offense Name</label>
-                                <input type="text" class="form-control" value={{ $data['ovense_name'] }} name="ovense_name">
+                                <input type="text" placeholder="Offense Name" class="form-control" value={{ $data['ovense_name'] }} name="ovense_name">
                             </div>
                             <div class="form-group">
                                 <label for="title">Employee</label>

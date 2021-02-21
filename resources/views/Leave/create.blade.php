@@ -7,23 +7,24 @@ Create Leave
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Create Leave</h1>
+        <h1>Manage Leave</h1>
         <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Leave</a></div>
+            <div class="breadcrumb-item active"><a href="{{ route('leave.index') }}">Leave</a></div>
             <div class="breadcrumb-item">Create </div>
         </div>
     </div>
+    @include('notification')
     <div class="section-body">
         <div class="row">
             <div class="col-md-8 col-sm-12">
                 <div class="card">
                     <form action="{{route('leave.store')}}" method="POST">
                         @csrf
-                        <div class="card-header"><h4>Add a New Company</h4></div>
+                        <div class="card-header"><h4>Assign a New Leave</h4></div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Leave Name</label>
-                                <input type="text" class="form-control" name="leave_name">
+                                <input type="text" placeholder="Leave Name" class="form-control" name="leave_name">
                             </div>
                             <div class="form-group">
                                 <label for="title">Employee</label>
@@ -46,7 +47,7 @@ Create Leave
                             </div>
                             <div class="form-group">
                                 <label for="title">Charge</label>
-                                <input type="text" class="form-control input_mask_currency" name="charge">
+                                <input type="text" placeholder="Charge(Leave Blank if not give Charge)" class="form-control input_mask_currency" name="charge">
                             </div>
                             <div class="form-group">
                                 <label for="">Date</label>
@@ -97,5 +98,9 @@ $(".input_mask_currency").inputmask({
     digits: 0,
     min: 0
 });
+
+$(document).ready(function(){
+    $('#select2').select2();
+})
 </script>
 @endsection

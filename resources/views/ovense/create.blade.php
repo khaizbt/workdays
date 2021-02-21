@@ -9,9 +9,9 @@ Create Offense
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Create Offense</h1>
+        <h1>Manage Offense</h1>
         <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="{{ route('employee.index') }}">Offense</a></div>
+            <div class="breadcrumb-item active"><a href="{{ route('ovense.index') }}">Offense</a></div>
             <div class="breadcrumb-item">Create </div>
         </div>
     </div>
@@ -23,11 +23,11 @@ Create Offense
                 <div class="card">
                     <form action="{{route('ovense.store')}}" method="POST">
                         @csrf
-                        <div class="card-header"><h4>Add a New Offense</h4></div>
+                        <div class="card-header"><h4>Assign a New Offense</h4></div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Offense Name <span class="required" aria-required="true"> * </span></label>
-                                <input type="text" class="form-control" name="ovense_name">
+                                <input type="text" placeholder="Offense Name" class="form-control" name="ovense_name">
                             </div>
                             <div class="form-group">
                                 <label for="title">Employee <span class="required" aria-required="true"> * </span></label>
@@ -53,7 +53,7 @@ Create Offense
                             </div>
                             <div class="form-group" id="punishment">
                                 <label for="title">Punishment</label>
-                                <input type="text" class="form-control input_mask_currency" placeholder="Punishment (Leave blank if not give punishment )" name="punishment">
+                                <input type="text" placeholder="Punishment" class="form-control input_mask_currency" placeholder="Punishment (Leave blank if not give punishment )" name="punishment">
                             </div>
                             <div class="form-group">
                                 <label for="">Date <span class="required" aria-required="true"> * </span></label>
