@@ -3,8 +3,7 @@
 @section('title')
 Edit Offense
 @endsection
-@section('style')
-@endsection
+@section('ovense', 'active')
 @section('content')
 <section class="section">
     <div class="section-header">

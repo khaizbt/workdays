@@ -3,7 +3,7 @@
 @section('title')
 Offense
 @endsection
-
+@section('ovense', 'active')
 @section('style')
     <style>
         #table-1{
