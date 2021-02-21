@@ -138,7 +138,7 @@
                     <td class="td">{{ $value_cut['cuts_name'] }}</td>
                     <td class="td">{{ $value_cut['Notes'] }}</td>
                     <td><img src="{{storage_path('app/'.$value_cut['image'])}}" width="50"></td>
-                    <td class="td">{{ $value_cut['value'] }}</td>
+                    <td class="td">Rp.{{ number_format($value_cut['value']) }}</td>
             </tr>
             @empty
             <tr>No Data</tr>

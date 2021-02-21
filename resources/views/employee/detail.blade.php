@@ -98,7 +98,7 @@ Detail Salary
                                                                     <td>{{ $value_ovense['ovense_name'] }}</td>
                                                                     <td>{{ $value_ovense['pinalty_type'] }}</td>
                                                                     <td>{{ $value_ovense['date'] }}</td>
-                                                                    <td>{{ $value_ovense['punishment'] ?? '0' }}</td>
+                                                                    <td>Rp.{{ number_format($value_ovense['punishment']) ?? '0' }}</td>
                                                             </tr>
                                                             @empty
                                                             <tr><td>
@@ -127,7 +127,7 @@ Detail Salary
                                                                     <td>{{ $value_paid['leave_name'] }}</td>
                                                                     <td>{{ $value_paid['date_start'] }}</td>
                                                                     <td>{{ $value_paid['date_end'] }}</td>
-                                                                    <td>{{ $value_paid['charge'] ?? "0" }}</td>
+                                                                    <td>Rp.{{ number_format($value_paid['charge']) ?? "0" }}</td>
                                                             </tr>
                                                             @empty
                                                             <tr><td>No Data</td></tr>
@@ -154,7 +154,7 @@ Detail Salary
                                                                     <td>{{ $value_cut['cuts_name'] }}</td>
                                                                     <td>{{ $value_cut['Notes'] }}</td>
                                                                     <td><img width="100px" src="{{ route('get.file', str_replace("/", "+", $value_cut['image'])) }}" alt=""></td>
-                                                                    <td>{{ $value_cut['value'] ?? '0' }}</td>
+                                                                    <td>Rp.{{ number_format($value_cut['value']) ?? '0' }}</td>
                                                             </tr>
                                                             @empty
                                                             <tr><td>No Data</td></tr>
