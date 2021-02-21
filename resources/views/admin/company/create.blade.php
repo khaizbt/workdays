@@ -65,12 +65,12 @@ Create Company
                             </div>
                             <div class="form-group">
                                 <label for="title">Maximum Leave <span class="required" aria-required="true"> * </span></label>
-                                <input type="number" min="1" class="form-control" name="maximum_leave">
+                                <input type="number" placeholder="Maximum Leave" min="1" class="form-control" name="maximum_leave">
                                 <span><i>Jumlah Maksimum Cuti yang boleh diambil dalam satu waktu</i></span>
                             </div>
                             <div class="form-group">
                                 <label for="title">Date Salary <span class="required" aria-required="true"> * </span></label>
-                                <input type="number" max="31" class="form-control" name="date_salary">
+                                <input type="number" placeholder="Date Salary" max="31" class="form-control" name="date_salary">
                                 <span><i>Tanggal dimana gaji dibayarkan ke karyawan setiap bulan</i></span>
                             </div>
 

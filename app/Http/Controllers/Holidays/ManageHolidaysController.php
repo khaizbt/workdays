@@ -238,7 +238,7 @@ class ManageHolidaysController extends Controller
 
         $is_data_empty = $holiday->count() == -100 ? true : false;
 
-        return view('leave.index', ['is_data_empty' => $is_data_empty, "holiday" => $holiday]);
+        return view('leave-new.index', ['is_data_empty' => $is_data_empty, "holiday" => $holiday]);
     }
 
     public function dataLeave(Request $request){
@@ -268,7 +268,7 @@ class ManageHolidaysController extends Controller
 
 
 
-        return view("leave.create", compact("employee"));
+        return view("leave-new.create", compact("employee"));
     }
 
     public function storeLeave(Request $request) {
@@ -352,7 +352,7 @@ class ManageHolidaysController extends Controller
     public function editLeave($id) {
         $data = Holiday::where("id", Crypt::decrypt($id))->with(["employee", 'leave_date_all'])->first();
         $employee = Employee::where("company_id", session("company_id"))->get();
-        return view("leave.edit", compact("data", "employee"));
+        return view("leave-new.edit", compact("data", "employee"));
     }
 
     public function updateLeave(Request $request, $id){
@@ -431,7 +431,7 @@ class ManageHolidaysController extends Controller
     }
 
     public function submitIndex() {
-        return view("leave.submit");
+        return view("leave-new.submit");
     }
 
     public function summitLeave(Request $request) {
@@ -552,7 +552,7 @@ class ManageHolidaysController extends Controller
         $employee_id = Employee::where("user_id", Auth::id())->first()->id;
         $data = Holiday::where("employee_id", $employee_id)->orderBy("date_start", "desc")->get()->count() == 0 ? true : false;
 
-        return view('leave.myleave', ['is_data_empty' => $data]);;
+        return view('leave-new.myleave', ['is_data_empty' => $data]);;
 
 
     }
