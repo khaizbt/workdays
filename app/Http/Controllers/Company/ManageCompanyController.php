@@ -209,7 +209,7 @@ class ManageCompanyController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', "Your Company has been updated")->withInput();
+        return redirect()->back()->withSuccess(["Your Company has been updated"])->withInput();
     }
 }
 
