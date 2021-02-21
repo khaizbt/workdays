@@ -209,7 +209,7 @@ Leave List
                     success: function(response) {
                         swal(
                         "Sccess!",
-                        "Leave Has Been Rejected!",
+                        "Leave Has Been Accepted!",
                         "success"
                         ).then((result) => {
                         if (result) {
