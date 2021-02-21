@@ -795,6 +795,7 @@ class ManageHolidaysController extends Controller
         // }
             // return view("employee.slipgaji", compact('employee'));
         // }
+        return view('employee.slipgaji',['employee'=>$employee]);
         $pdf = PDF::loadview('employee.slipgaji',['employee'=>$employee]);
 	    return $pdf->stream('Slip Gaji-'.$employee['name'].'.pdf');
     }

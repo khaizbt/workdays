@@ -8,17 +8,17 @@
 
     <style>
         .table-border, .th, .td {
-  border: 1px solid black;
-}
+            border: 1px solid black;
+        }
 
-.table-border {
-  width: 100%;
-  border-collapse: collapse;
-}
+        .table-border {
+            width: 100%;
+            border-collapse: collapse;
+        }
     </style>
 </head>
 <body>
-    <table width="100%">
+    <table width="100%" style="font-family:Arial, Helvetica, sans-serif; font-size:0.85em">
         <tr>
             <td width="25" align="center"><img src="{{ asset('assets/img/stisla-fill.svg') }}" alt="logo" width="100"></td>
             <td width="50" align="center">
@@ -32,7 +32,7 @@
 <hr>
 <br>
 <div style="margin-left: 50px">
-    <table>
+    <table style="font-family:Arial, Helvetica, sans-serif; font-size:0.85em">
         <tr>
             <td width="100px">Name</td>
             <td>: {{ $employee['name'] }}</td>
@@ -43,28 +43,28 @@
         </tr>
         <tr>
             <td width="100px">Salary</td>
-            <td>: Rp.{{ number_format($employee['salary']) }}</td>
+            <td>: Rp. {{ number_format($employee['salary'],0,',','.') }}</td>
         </tr>
         <tr>
             <td width="100px">Punishment</td>
-            <td>: Rp.{{ number_format($employee['punishment_total']) }}</td>
+            <td>: Rp. {{ number_format($employee['punishment_total'],0,',','.') }}</td>
         </tr>
         <tr>
             <td width="100px">Holiday Paid</td>
-            <td>: Rp.{{ number_format($employee['holiday_paid_total']) }}</td>
+            <td>: Rp. {{ number_format($employee['holiday_paid_total'],0,',','.') }}</td>
         </tr>
         <tr>
             <td width="100px">Salary Cut</td>
-            <td>: Rp.{{ number_format($employee['salary_cut_total']) }}</td>
+            <td>: Rp. {{ number_format($employee['salary_cut_total'],0,',','.') }}</td>
         </tr>
         <tr>
             <td width="100px">Total Salary</td>
-            <td>: Rp.{{ number_format($employee['salary_fix']) }}</td>
+            <td>: Rp. {{ number_format($employee['salary_fix'],0,',','.') }}</td>
         </tr>
       </table>
       <br>
-      <h3>Ovense List</h3>
-      <table class="table-border" style="width: 600px">
+      <h3 style="font-family:Arial, Helvetica, sans-serif; font-size:0.85em">Ovense List</h3>
+      <table class="table-border" style="width: 600px; font-family:Arial, Helvetica, sans-serif; font-size:0.85em">
         <thead align="center">
             <tr>
                 <th class="td" scope="col">#</th>
@@ -89,8 +89,8 @@
         </tbody>
     </table>
     <br>
-    <h3>Leave Paid List</h3>
-      <table class="table-border" style="width: 600px">
+    <h3  style="font-family:Arial, Helvetica, sans-serif; font-size:0.85em">Leave Paid List</h3>
+      <table class="table-border" style="width: 600px; font-family:Arial, Helvetica, sans-serif; font-size:0.85em">
         <thead align="center">
             <tr>
                 <th class="td" scope="col">#</th>
@@ -117,8 +117,8 @@
 
 
 
-    <h3>Salary Cut</h3>
-      <table class="table-border" style="width: 600px">
+    <h3 style="font-family:Arial, Helvetica, sans-serif; font-size:0.85em">Salary Cut</h3>
+      <table class="table-border" style="width: 600px; font-family:Arial, Helvetica, sans-serif; font-size:0.85em">
         <thead align="center">
             <tr>
                 <th class="td" scope="col">#</th>
