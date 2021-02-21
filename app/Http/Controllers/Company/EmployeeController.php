@@ -28,7 +28,7 @@ class EmployeeController extends Controller
 
     public function data(Request $request) {
 
-        // if($request->ajax()) {
+        if($request->ajax()) {
             $data = Employee::where('company_id', session('company_id'))->get();
             return Datatables::of($data)
                 ->addColumn('action', function ($data) {
@@ -40,9 +40,9 @@ class EmployeeController extends Controller
             ->addIndexColumn()
                 ->rawColumns(['action'])
                 ->make(true);
-        // } else {
-        //     return "Request Not Allowed";
-        // }
+        } else {
+            return "Request Not Allowed";
+        }
     }
 
     public function create() {
@@ -65,7 +65,7 @@ class EmployeeController extends Controller
                         ->withInput();
         }
         DB::beginTransaction();
-        // try {
+        try {
             //Validasi Email
             $post['salary'] = str_replace(['Rp', " ", "."], "", $post['salary']);
             $user = User::where('email', $post['email'])->first();
@@ -93,10 +93,10 @@ class EmployeeController extends Controller
             DB::commit();
             return redirect('/employee')->withSuccess(['Employee has been created']);
 
-        // } catch (\Throwable $th) {
-        //     DB::rollback();
-        //     return redirect('/employee')->withErrors(['Create Employee Failed']);
-        // }
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect('/employee')->withErrors(['Create Employee Failed']);
+        }
     }
 
     public function edit($id) {
@@ -131,7 +131,7 @@ class EmployeeController extends Controller
         }
 
         DB::beginTransaction();
-        // try {
+        try {
 
             $employee = Employee::where('id', $id)->first();
             $post['salary'] = str_replace(['Rp', " ", "."], "", $post['salary']);
@@ -152,10 +152,10 @@ class EmployeeController extends Controller
 
             DB::commit();
             return redirect('/employee')->withSuccess(['Employee has been updated']);
-        // } catch (\Throwable $th) {
-        //     DB::rollback();
-        //     return redirect('/employee')->withErrors(['Update Employee Failed']);
-        // }
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect('/employee')->withErrors(['Update Employee Failed']);
+        }
     }
 
     public function delete($id) {

@@ -26,7 +26,7 @@ class SalaryCutController extends Controller
     }
 
     public function data(Request $request) {
-        // if($request->ajax()) {
+        if($request->ajax()) {
             $data = SalaryCuts::whereHas("employee", function($q){
                 $q->where("company_id", session("company_id"));
             })->with("employee")->orderBy("created_at", "desc")->get();
@@ -43,7 +43,7 @@ class SalaryCutController extends Controller
             ->addIndexColumn()
                 ->rawColumns(['action', 'status_value'])
                 ->make(true);
-        // }
+        }
     }
 
     public function create() {

@@ -242,7 +242,7 @@ class ManageHolidaysController extends Controller
     }
 
     public function dataLeave(Request $request){
-        // if($request->ajax()) {
+        if($request->ajax()) {
             $data = Holiday::whereHas("employee", function($q){
                 $q->where("company_id", session("company_id"));
             })->with("employee")->get();
@@ -260,7 +260,7 @@ class ManageHolidaysController extends Controller
             ->addIndexColumn()
                 ->rawColumns(['action', 'status_str', 'approved_str'])
                 ->make(true);
-        // }
+        }
     }
 
     public function createLeave() {
@@ -531,21 +531,23 @@ class ManageHolidaysController extends Controller
         // return redirect("/leave")->with("success", "Leave has been Rejected");
     }
 
-    public function listMyLeave() {
-        $employee_id = Employee::where("user_id", Auth::id())->first()->id;
-        $data = Holiday::where("employee_id", $employee_id)->orderBy("date_start", "desc")->get();
+    public function listMyLeave(Request $request) {
+        if($request->ajax()){
+            $employee_id = Employee::where("user_id", Auth::id())->first()->id;
+            $data = Holiday::where("employee_id", $employee_id)->orderBy("date_start", "desc")->get();
 
-        return Datatables::of($data)
-        ->addColumn("approved", function($q){
-            return ($q['is_approved'] == 1) ? "approved" : (($q['is_approved'] == 0) ? "rejected" : "pending");
-        })->addColumn("status_str", function($q){
-            return ($q['status'] == 1) ? "cuti" : (($q['status'] == 2) ? "sakit" : (($q['status'] == 3) ? "alpha" : "izin"));
-        }) ->addColumn('action', function ($data) {
-            return "<a href='".route('company.edit', [$data['id']])."'><i class='fa fa-edit text-info'></i></a>";
-        })
-        ->addIndexColumn()
-        ->rawColumns(["status_str", "action"])
-            ->make(true);
+            return Datatables::of($data)
+            ->addColumn("approved", function($q){
+                return ($q['is_approved'] == 1) ? "approved" : (($q['is_approved'] == 0) ? "rejected" : "pending");
+            })->addColumn("status_str", function($q){
+                return ($q['status'] == 1) ? "cuti" : (($q['status'] == 2) ? "sakit" : (($q['status'] == 3) ? "alpha" : "izin"));
+            }) ->addColumn('action', function ($data) {
+                return "<a href='".route('company.edit', [$data['id']])."'><i class='fa fa-edit text-info'></i></a>";
+            })
+            ->addIndexColumn()
+            ->rawColumns(["status_str", "action"])
+                ->make(true);
+        }
     }
 
     public function myLeave() {
@@ -564,8 +566,9 @@ class ManageHolidaysController extends Controller
 
 
 
-    public function countSalaryEmployeeAll($month = null) {
-        $company = Company::where("id", session("company_id"))->first();
+    public function countSalaryEmployeeAll(Request $request, $month = null) {
+        if($request->ajax()){
+            $company = Company::where("id", session("company_id"))->first();
 
 
         for($i = 1; $i <= 12; $i++){
@@ -644,6 +647,7 @@ class ManageHolidaysController extends Controller
             ->addIndexColumn()
                 ->rawColumns(['action'])
                 ->make(true);
+        }
 
     }
 

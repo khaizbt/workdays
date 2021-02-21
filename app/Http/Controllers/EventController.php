@@ -21,18 +21,19 @@ class EventController extends Controller
     }
 
     public function data(Request $request) {
-
-        $data = Event::where("company_id", session("company_id"))->get();
-        return Datatables::of($data)
-        ->addColumn('action', function ($data) {
-            return "<a href='".route('event.edit', [Crypt::encrypt($data['id'])])."'><i class='fa fa-edit text-info'></i></a>
-            | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
-    })->addColumn('link', function($row){
-        return  ($row['maps'] != null) ? "<a href='".$row['maps']."' target='_blank'>Link Maps</a>" :'-';
-    })
-    ->addIndexColumn()
-        ->rawColumns(['action', 'link'])
-        ->make(true);
+        if($request->ajax()){
+            $data = Event::where("company_id", session("company_id"))->get();
+            return Datatables::of($data)
+            ->addColumn('action', function ($data) {
+                return "<a href='".route('event.edit', [Crypt::encrypt($data['id'])])."'><i class='fa fa-edit text-info'></i></a>
+                | <a href='javascript:;' class='btn-delete' onClick='deleteSweet(".$data["id"].")' title=".$data['name']."><i class='fa fa-trash text-danger'></i></a>";
+        })->addColumn('link', function($row){
+            return  ($row['maps'] != null) ? "<a href='".$row['maps']."' target='_blank'>Link Maps</a>" :'-';
+        })
+        ->addIndexColumn()
+            ->rawColumns(['action', 'link'])
+            ->make(true);
+        }
     }
 
     public function create() {
