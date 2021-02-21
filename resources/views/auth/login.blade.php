@@ -7,6 +7,7 @@
   <div class="card-body">
     <form method="POST" action="{{ route('login') }}">
         @csrf
+        @captcha
       <div class="form-group">
         <label for="email">Email</label>
         <input aria-describedby="emailHelpBlock" id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" placeholder="Registered email address" tabindex="1" value="{{ old('email') }}" autofocus>
