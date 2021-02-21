@@ -24,11 +24,11 @@ Create Event
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Event Name</label>
-                                <input type="text" class="form-control" name="event_name" required>
+                                <input type="text" class="form-control" placeholder="Event Name" name="event_name" required>
                             </div>
                             <div class="form-group">
                                 <label for="notes">Notes</label>
-                                <textarea name="note" id="" class="form-control" cols="30" rows="50" required></textarea>
+                                <textarea name="note" id="" placeholder="Event Notes" class="form-control" cols="30" rows="50" required></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="title">Date And Time</label>
@@ -36,7 +36,11 @@ Create Event
                             </div>
                             <div class="form-group">
                                 <label for="value">Place</label>
-                                <input type="text"  class="form-control"name="place" id="" required>
+                                <input type="text" placeholder="Place Event" class="form-control"name="place" id="" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="value">Place</label>
+                                <input type="text" placeholder="Link Maps Place Events"  class="form-control" name="maps">
                             </div>
                         </div>
                             <div class="card-footer">

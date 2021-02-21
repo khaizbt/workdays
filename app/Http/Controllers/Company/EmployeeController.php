@@ -115,8 +115,8 @@ class EmployeeController extends Controller
         $validator = Validator::make($post, [
             'name' => 'required',
             'position' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'email' => ['required', Rule::unique('users')->ignore($id)],
+            // 'email' => 'required|email|unique:users,email',
+            // 'email' => ['required', Rule::unique('users')->ignore($id)],
             'salary' =>'required'
         ]);
 
@@ -131,14 +131,14 @@ class EmployeeController extends Controller
         }
 
         DB::beginTransaction();
-        try {
+        // try {
 
             $employee = Employee::where('id', $id)->first();
             $post['salary'] = str_replace(['Rp', " ", "."], "", $post['salary']);
             $update = $employee->update([
                 "name" => $post['name'],
                 "position" => $post['position'],
-                "status" => $post['status'],
+                // "status" => $post['status'],
                 "salary" => $post['salary']
             ]);
 
@@ -151,11 +151,11 @@ class EmployeeController extends Controller
             }
 
             DB::commit();
-            return redirect('/company')->with(['success' => 'Employee has been updated']);
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return redirect('/company')->with(['error' => 'Update Employee Failed']);
-        }
+            return redirect('/employee')->withSuccess(['Employee has been updated']);
+        // } catch (\Throwable $th) {
+        //     DB::rollback();
+        //     return redirect('/employee')->withErrors(['Update Employee Failed']);
+        // }
     }
 
     public function delete($id) {

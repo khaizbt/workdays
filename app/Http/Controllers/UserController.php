@@ -34,7 +34,7 @@ class UserController extends Controller
             {
                 $users = $users->where('name', 'like', '%'.$request->q.'%')->orWhere('email', $request->q);
             }
-            $users = $users->paginate(config('stisla.perpage'))->appends(['q' => $request->q]);
+            $users = $users->whereNotIn('level', [3])->paginate(config('stisla.perpage'))->appends(['q' => $request->q]);
             return response()->json($users);
         }
         return view('admin.users.index');

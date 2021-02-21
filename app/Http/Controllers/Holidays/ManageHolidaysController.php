@@ -112,7 +112,7 @@ class ManageHolidaysController extends Controller
             $val_ovense['deskripsi'] = $val_ovense['employee']['name'];
             // $offense[$row] =
                 $val_ovense['color'] = 'red';
-            // return $val_ovense;
+                $val_ovense['url'] =  (Auth::user()->hasRole('Admin')) ? 'ovense' : 'ovense/my-ovense';;
             $offense[date('YmdHi', strtotime($val_ovense['created_at']))] = $val_ovense;
 
         }

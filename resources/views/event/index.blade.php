@@ -24,7 +24,7 @@ Edit Event
 @section('content')
 <section class="section">
     <div class="section-header">
-        <h1>Manage Leave</h1>
+        <h1>Manage Event</h1>
     </div>
     @include('notification')
     <div class="section-body">
@@ -32,7 +32,7 @@ Edit Event
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Leave
+                        <h4>Event
                             <!---->
                         </h4>
                         <div class="card-header-action"><a href="{{route('event.create')}}"
@@ -42,7 +42,7 @@ Edit Event
                         @if ($is_data_empty)
                             <div class="text-center p-3 text-muted">
                                 <h5>No Results</h5>
-                                <p>Looks like you have not added any companies yet!</p>
+                                <p>Looks like you have not added any event yet!</p>
                             </div>
                         @else
                             <table id="table-1" style="width: 100%">
@@ -53,6 +53,7 @@ Edit Event
                                         <th>Note</th>
                                         <th>Time</th>
                                         <th>Place</th>
+                                        <th>Maps</th>
                                         <th style="width: 10%;">Action</th>
                                     </tr>
                                 </thead>
@@ -102,6 +103,10 @@ Edit Event
                 name: 'place'
             },
             {
+                data: 'link',
+                name: 'link'
+            },
+            {
                 data: 'action',
                 name: 'action',
                 orderable: true
@@ -114,7 +119,7 @@ Edit Event
 
 
     function deleteSweet(id){
-        let url = $('meta[name="url"]').attr('content')+'/leave/delete/'+id;
+        let url = $('meta[name="url"]').attr('content')+'/event/delete/'+id;
             let csrf_token = $('meta[name="csrf-token"]').attr('content');
             swal({
                 title: 'Are you sure?',
@@ -144,16 +149,16 @@ Edit Event
                                     text: 'Something went wrong!'
                                 }).then((result) => {
                                         if (result.value) {
-                                            $(location).attr('href', "{{route('leave.index')}}");
+                                            $(location).attr('href', "{{route('event.index')}}");
                                         }
                                     });
                             }
                             if (response == 1) {
                                     swal("Success!", "Data has been deleted!", "success").then((result) => {
                                         if (result.value) {
-                                            $(location).attr('href', "{{route('leave.index')}}");
+                                            $(location).attr('href', "{{route('event.index')}}");
                                         }
-                                    $(location).attr('href', "{{route('leave.index')}}");
+                                    $(location).attr('href', "{{route('event.index')}}");
                                 });
                             }
                         },
